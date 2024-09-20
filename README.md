@@ -23,6 +23,9 @@ source env/bin/activate
 
 # Install requirements
 pip3 install -r requirements.txt
+
+# If there exists additional install library when developing, please update requirements.txt
+pip3 freeze > requirements.txt
 ```
 
 Run server
