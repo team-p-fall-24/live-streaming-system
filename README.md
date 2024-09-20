@@ -12,7 +12,7 @@ Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
 
 - To deploy on Linux server, we need to follow this guideline https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg for install latest version instead of using apt install.
 
-### Project configuration
+### Project Configuration
 
 ```
 # Create vitural env
