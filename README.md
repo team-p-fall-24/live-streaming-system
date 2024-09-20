@@ -2,7 +2,7 @@
 
 ## Prerequisite and installation
 
-Built and tested with Python 3.12
+Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
 
 ### Required Libraries
 
