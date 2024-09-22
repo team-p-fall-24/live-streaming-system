@@ -31,12 +31,53 @@ pip3 freeze > requirements.txt
 Run server
 
 ```
-python3 manage.py runserver
+uvicorn app.main:app --reload
 ```
 
-Before running the server, make sure to create and apply the database migrations (If needed):
+Swagger UI for API docs can be checked via http://127.0.0.1:8000/docs
+
+## Project Structure Overview
 
 ```
-python3 manage.py makemigrations
-python3 manage.py migrate
+live-streaming-system/
+├── app/
+│   ├── __init__.py                # Initialization file for the app module
+│   ├── main.py                    # Entry point for the FastAPI application
+│   ├── core/
+│   │   ├── __init__.py
+│   │   └── config.py              # Configuration settings for the project
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── api_v1/
+│   │   │   ├── __init__.py
+│   │   │   ├── api.py             # API routing for version 1
+│   │   │   ├── endpoints/
+│   │   │   │   ├── __init__.py
+│   │   │   │   ├── live_stream.py # Endpoints related to live streaming
+│   │   │   │   ├── audio_processing.py # Endpoints related to audio processing
+│   │   │   │   ├── subtitle_sync.py    # Endpoints related to subtitle synchronization
+│   ├── models/
+│   │   ├── __init__.py            # Placeholder for database models
+│   ├── schemas/
+│   │   ├── __init__.py
+│   │   ├── live_stream.py         # Pydantic schemas for live streaming
+│   │   ├── audio_processing.py    # Pydantic schemas for audio processing
+│   │   ├── subtitle_sync.py       # Pydantic schemas for subtitle synchronization
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── live_stream_service.py # Business logic for live streaming
+│   │   ├── audio_service.py       # Business logic for audio processing
+│   │   ├── subtitle_service.py    # Business logic for subtitle synchronization
+│   ├── workers/
+│   │   ├── __init__.py
+│   │   ├── background_tasks.py    # Background task management
+│   └── db/
+│       ├── __init__.py
+│       ├── base.py                # Base model class for ORM
+│       └── session.py             # Database session management
+├── .env                           # Environment variables
+├── .gitignore                     # Git ignore file
+├── requirements.txt               # Project dependencies
+├── .github                        # GitHub configuration for CI/CD and GitHub PR/Issues Template
+└── README.md                      # Project documentation
 ```
