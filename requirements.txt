@@ -45,3 +45,4 @@ vine==5.1.0
 watchfiles==0.24.0
 wcwidth==0.2.13
 websockets==13.0.1
+librosa==0.10.2.post1

@@ -12,6 +12,16 @@ Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
 
 - To deploy on Linux server, we need to follow this guideline https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg for install latest version instead of using apt install.
 
+#### Librosa library
+
+- For MacOS users, please use
+```
+git clone https://github.com/librosa/librosa.git
+python -m pip install -e librosa
+```
+
+- Otherwises, install librosa with `pip install librosa`
+
 ### Project Configuration
 
 ```
