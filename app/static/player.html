@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Streaming Player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            background-color: #1f1f1f;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #2c2c2c;
+            color: #fff;
+            font-size: 14px;
+        }
+        button {
+            background-color: #1db954;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #17a54a;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+        .controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        .loading-message {
+            color: #888;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live HLS Streaming Player</h1>
+        <div class="input-container">
+            <input type="text" id="urlInput" placeholder="Enter the streaming URL (.m3u8)" />
+            <button onclick="loadStream()">Load Stream</button>
+        </div>
+        <video id="video" controls></video>
+        <div class="controls">
+            <button class="button" id="playButton" disabled>Play</button>
+            <button class="button" id="pauseButton" disabled>Pause</button>
+        </div>
+        <div class="loading-message" id="loadingMessage">Waiting for a URL...</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script>
+        const video = document.getElementById('video');
+        const playButton = document.getElementById('playButton');
+        const pauseButton = document.getElementById('pauseButton');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const urlInput = document.getElementById('urlInput');
+
+        function toggleButtons(enable) {
+            playButton.disabled = !enable;
+            pauseButton.disabled = !enable;
+        }
+
+        function loadStream() {
+            const videoSrc = urlInput.value.trim();
+            if (!videoSrc) {
+                alert('Please enter a valid .m3u8 URL');
+                return;
+            }
+            loadVideo(videoSrc);
+        }
+
+        function loadVideo(videoSrc) {
+            // Reset player state
+            video.pause();
+            video.src = "";
+            loadingMessage.textContent = 'Loading video...';
+            toggleButtons(false);
+
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(videoSrc);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    toggleButtons(true);
+                    loadingMessage.style.display = 'none';
+                });
+                hls.on(Hls.Events.ERROR, function (event, data) {
+                    console.error('HLS error:', data);
+                    loadingMessage.textContent = 'Error loading video. Please check the URL.';
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = videoSrc;
+                video.addEventListener('loadedmetadata', function () {
+                    toggleButtons(true);
+                    loadingMessage.style.display = 'none';
+                });
+                video.addEventListener('error', function () {
+                    loadingMessage.textContent = 'Error loading video. Please check the URL.';
+                });
+            } else {
+                loadingMessage.textContent = 'Your browser does not support HLS streaming.';
+            }
+        }
+
+        playButton.addEventListener('click', () => video.play());
+        pauseButton.addEventListener('click', () => video.pause());
+    </script>
+</body>
+</html>
