@@ -1,15 +1,12 @@
-from fastapi import APIRouter, BackgroundTasks
-from app.schemas.live_stream import LiveStreamRequest
-from app.services.live_stream_service import start_live_stream, stop_live_stream
+from fastapi import APIRouter, HTTPException
+from app.services import live_stream_service
 
 router = APIRouter()
 
-@router.post("/start")
-async def start_live_stream_endpoint(request: LiveStreamRequest, background_tasks: BackgroundTasks):
-    background_tasks.add_task(start_live_stream, request.stream_url)
-    return {"message": "Live streaming started"}
-
-@router.post("/stop")
-async def stop_live_stream_endpoint(request: LiveStreamRequest):
-    stop_live_stream(request.stream_url)
-    return {"message": "Live streaming stopped"}
+@router.post("/process-video/")
+async def process_video_endpoint(stream_url: str):
+    try:
+        live_stream_service.process_video(stream_url)
+        return {"message": "Video stream processing started"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

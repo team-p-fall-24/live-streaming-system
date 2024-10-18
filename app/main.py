@@ -14,6 +14,9 @@ app.include_router(api_router, prefix="/api/v1")
 # Serve static files (e.g., the HTML player)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
+# Mount the static directory to serve video chunks
+app.mount("/media", StaticFiles(directory="app/media/chunks"), name="media")
+
 # Redirect root to the player page with an example .m3u8 URL (you can adjust this later)
 @app.get("/")
 async def main():
