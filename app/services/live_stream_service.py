@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 VIDEO_OUTPUT = "app/media/chunks"
 PLAYLIST_OUTPUT = "app/media/playlists"
 PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
+MAX_SEGMENTS = 5  # Keep the last 5 segments in the playlist
 
 # Set up an executor for background tasks
 executor = ThreadPoolExecutor(max_workers=1)
@@ -26,11 +27,18 @@ def update_m3u8_playlist():
             print("No video chunks found to create m3u8 file.")
             return
 
+        # Keep only the last MAX_SEGMENTS
+        chunk_files = chunk_files[-MAX_SEGMENTS:]
+
+        # Calculate the media sequence number based on the number of segments
+        media_sequence = int(os.path.splitext(os.path.basename(chunk_files[0]))[0].split('_')[1])
+
         # Create the .m3u8 content
         m3u8_content = "#EXTM3U\n"
         m3u8_content += "#EXT-X-VERSION:3\n"
+        m3u8_content += "#EXT-X-PLAYLIST-TYPE:LIVE\n"
         m3u8_content += "#EXT-X-TARGETDURATION:10\n"
-        m3u8_content += "#EXT-X-MEDIA-SEQUENCE:0\n\n"
+        m3u8_content += f"#EXT-X-MEDIA-SEQUENCE:{media_sequence}\n\n"
 
         # Flag to check if it's the first segment
         first_segment = True
@@ -45,10 +53,9 @@ def update_m3u8_playlist():
             else:
                 first_segment = False
 
-            m3u8_content += f"#EXTINF:{duration},\n/api/v1/streaming/chunks/{chunk_filename}\n"
+            m3u8_content += f"#EXTINF:{duration},\n/api/v1/live/chunks/{chunk_filename}\n"
 
-        # Add the #EXT-X-ENDLIST tag to signify the end of the playlist
-        m3u8_content += "\n#EXT-X-ENDLIST\n"
+        # Do NOT add the #EXT-X-ENDLIST tag for live streaming
 
         # Write the .m3u8 file to the playlist directory
         with open(PLAYLIST_FILE, "w") as f:
@@ -68,7 +75,7 @@ def process_video_files():
             for file in new_files:
                 processed_files.add(file)
                 print(f"New chunk detected: {file}")
-            # Update the .m3u8 file whenever a new chunk is detected
+            # Update the .m3u8 file whenever new chunks are detected
             update_m3u8_playlist()
         time.sleep(1)
 
@@ -93,8 +100,7 @@ def run_ffmpeg(stream_url: str):
         "-f", "segment",       # Segment format
         "-segment_time", "10", # Duration of each segment
         "-strftime", "1",      # Include date-time in the output filenames
-        "-reset_timestamps", "1",  # Reset timestamps for each segment
-        f"{VIDEO_OUTPUT}/video_%Y%m%d%H%M%S.ts"
+        f"{VIDEO_OUTPUT}/video_%s.ts"  # Use epoch time for unique sequence numbers
     ]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(f"Video extraction started from {stream_url}")

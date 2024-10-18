@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
-from fastapi.responses import FileResponse
+from fastapi.responses import Response, FileResponse
 from app.services import live_stream_service
 import os
 
@@ -20,12 +20,14 @@ async def process_video_endpoint(background_tasks: BackgroundTasks, stream_url: 
 async def get_m3u8():
     playlist_path = "app/media/playlists/playlist.m3u8"
     if os.path.isfile(playlist_path):
-        # Use FileResponse to directly serve the latest version of the .m3u8 file
-        return FileResponse(
-            playlist_path, 
-            media_type="application/vnd.apple.mpegurl", 
-            headers={"Cache-Control": "no-store"}
-        )
+        headers = {
+            "Content-Type": "application/vnd.apple.mpegurl",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        with open(playlist_path, "rb") as f:
+            return Response(content=f.read(), headers=headers, media_type="application/vnd.apple.mpegurl")
     else:
         raise HTTPException(status_code=404, detail="Playlist not found")
 
@@ -34,7 +36,12 @@ async def get_m3u8():
 async def get_chunk(filename: str):
     file_path = f"app/media/chunks/{filename}"
     if os.path.isfile(file_path):
-        return FileResponse(file_path, media_type="video/MP2T")
+        headers = {
+            "Content-Type": "video/MP2T",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        return FileResponse(file_path, headers=headers, media_type="video/MP2T")
     else:
         raise HTTPException(status_code=404, detail="Chunk file not found")
-    
