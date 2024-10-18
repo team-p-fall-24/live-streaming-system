@@ -27,18 +27,33 @@ def update_m3u8_playlist():
             return
 
         # Create the .m3u8 content
-        m3u8_content = "#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:10\n"
-        m3u8_content += "#EXT-X-PLAYLIST-TYPE:LIVE\n"
+        m3u8_content = "#EXTM3U\n"
+        m3u8_content += "#EXT-X-VERSION:3\n"
+        m3u8_content += "#EXT-X-TARGETDURATION:10\n"
+        m3u8_content += "#EXT-X-MEDIA-SEQUENCE:0\n\n"
+
+        # Flag to check if it's the first segment
+        first_segment = True
 
         for chunk_file in chunk_files:
-            duration = 10  # Assuming each chunk is 10 seconds
+            duration = 10.0  # Assuming each chunk is 10 seconds
             chunk_filename = os.path.basename(chunk_file)
+
+            # Add #EXT-X-DISCONTINUITY tag before segments after the first
+            if not first_segment:
+                m3u8_content += "#EXT-X-DISCONTINUITY\n"
+            else:
+                first_segment = False
+
             m3u8_content += f"#EXTINF:{duration},\n/api/v1/streaming/chunks/{chunk_filename}\n"
 
-        # Do not add #EXT-X-ENDLIST to keep the playlist open
+        # Add the #EXT-X-ENDLIST tag to signify the end of the playlist
+        m3u8_content += "\n#EXT-X-ENDLIST\n"
+
+        # Write the .m3u8 file to the playlist directory
         with open(PLAYLIST_FILE, "w") as f:
             f.write(m3u8_content)
-        print(f"Updated m3u8 file: {PLAYLIST_FILE}")
+        print(f"Updated m3u8 file with {len(chunk_files)} chunks.")
 
     except Exception as e:
         print(f"Error updating m3u8 file: {e}")
