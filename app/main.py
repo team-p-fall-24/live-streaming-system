@@ -4,9 +4,18 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from app.api.api_v1.api import api_router
+from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
+
+# Configure CORS middleware to allow access from different origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for testing; be more specific in production
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*"],
+)
 
 # Include API routes
 app.include_router(api_router, prefix="/api/v1")
