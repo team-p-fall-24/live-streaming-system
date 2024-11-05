@@ -81,3 +81,12 @@ live-streaming-system/
 ├── .github                        # GitHub configuration for CI/CD and GitHub PR/Issues Template
 └── README.md                      # Project documentation
 ```
+
+# How to test the current implementation
+
+Excute the .m3u8 input link via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_video__post`
+
+Then, open own player http://127.0.0.1:8000/static/player.html with this endpoint of livestreaming output
+```
+http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8
+```

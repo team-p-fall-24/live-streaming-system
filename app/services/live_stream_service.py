@@ -9,7 +9,9 @@ from concurrent.futures import ThreadPoolExecutor
 VIDEO_OUTPUT = "app/media/chunks"
 PLAYLIST_OUTPUT = "app/media/playlists"
 PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
-MAX_SEGMENTS = 5  # Keep the last 5 segments in the playlist
+
+# Configurable chunk duration in seconds
+CHUNK_DURATION = 10 # Change this value to different fixed duration later. Currently using 10 seconds.
 
 # Set up an executor for background tasks
 executor = ThreadPoolExecutor(max_workers=1)
@@ -19,6 +21,7 @@ def setup_media_directories():
     os.makedirs(VIDEO_OUTPUT, exist_ok=True)
     os.makedirs(PLAYLIST_OUTPUT, exist_ok=True)
 
+# Function to update the m3u8 playlist file dynamically
 def update_m3u8_playlist():
     try:
         # List all video chunks in the output directory
@@ -27,9 +30,6 @@ def update_m3u8_playlist():
             print("No video chunks found to create m3u8 file.")
             return
 
-        # Keep only the last MAX_SEGMENTS
-        chunk_files = chunk_files[-MAX_SEGMENTS:]
-
         # Calculate the media sequence number based on the number of segments
         media_sequence = int(os.path.splitext(os.path.basename(chunk_files[0]))[0].split('_')[1])
 
@@ -37,23 +37,12 @@ def update_m3u8_playlist():
         m3u8_content = "#EXTM3U\n"
         m3u8_content += "#EXT-X-VERSION:3\n"
         m3u8_content += "#EXT-X-PLAYLIST-TYPE:LIVE\n"
-        m3u8_content += "#EXT-X-TARGETDURATION:10\n"
+        m3u8_content += f"#EXT-X-TARGETDURATION:{CHUNK_DURATION}\n"
         m3u8_content += f"#EXT-X-MEDIA-SEQUENCE:{media_sequence}\n\n"
 
-        # Flag to check if it's the first segment
-        first_segment = True
-
         for chunk_file in chunk_files:
-            duration = 10.0  # Assuming each chunk is 10 seconds
             chunk_filename = os.path.basename(chunk_file)
-
-            # Add #EXT-X-DISCONTINUITY tag before segments after the first
-            if not first_segment:
-                m3u8_content += "#EXT-X-DISCONTINUITY\n"
-            else:
-                first_segment = False
-
-            m3u8_content += f"#EXTINF:{duration},\n/api/v1/live/chunks/{chunk_filename}\n"
+            m3u8_content += f"#EXTINF:{CHUNK_DURATION},\n/api/v1/live/chunks/{chunk_filename}\n"
 
         # Do NOT add the #EXT-X-ENDLIST tag for live streaming
 
@@ -87,20 +76,20 @@ def process_video(stream_url: str):
     except Exception as e:
         print(f"Error processing video: {e}")
 
-# Function to run the FFmpeg command
+# Function to run the FFmpeg command with configurable chunk duration
 def run_ffmpeg(stream_url: str):
     setup_media_directories()
 
-    # FFmpeg command to segment the video every 10 seconds
+    # FFmpeg command to segment the video with a configurable chunk duration
     command = [
         "ffmpeg",
         "-i", stream_url,
-        "-c:v", "copy",        # Copy the video codec as is (no re-encoding)
-        "-c:a", "aac",         # Audio codec
-        "-f", "segment",       # Segment format
-        "-segment_time", "10", # Duration of each segment
-        "-strftime", "1",      # Include date-time in the output filenames
-        f"{VIDEO_OUTPUT}/video_%s.ts"  # Use epoch time for unique sequence numbers
+        "-c:v", "copy",                    # Copy video codec as is (no re-encoding)
+        "-c:a", "aac",                     # Audio codec
+        "-f", "segment",                   # Segment format
+        "-segment_time", str(CHUNK_DURATION),  # Duration of each segment
+        "-strftime", "1",                  # Include date-time in the output filenames
+        f"{VIDEO_OUTPUT}/video_%s.ts"      # Use epoch time for unique sequence numbers
     ]
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(f"Video extraction started from {stream_url}")
