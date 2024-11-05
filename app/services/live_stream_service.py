@@ -80,17 +80,22 @@ def process_video(stream_url: str):
 def run_ffmpeg(stream_url: str):
     setup_media_directories()
 
-    # FFmpeg command to segment the video with a configurable chunk duration
+    playlist_path = os.path.join(PLAYLIST_OUTPUT, "playlist.m3u8")
+    segment_filename = os.path.join(VIDEO_OUTPUT, "video_%d.ts")
+
+    # FFmpeg command to use the HLS muxer for segmenting
     command = [
         "ffmpeg",
         "-i", stream_url,
-        "-c:v", "copy",                    # Copy video codec as is (no re-encoding)
-        "-c:a", "aac",                     # Audio codec
-        "-f", "segment",                   # Segment format
-        "-segment_time", str(CHUNK_DURATION),  # Duration of each segment
-        "-strftime", "1",                  # Include date-time in the output filenames
-        f"{VIDEO_OUTPUT}/video_%s.ts"      # Use epoch time for unique sequence numbers
+        "-c:v", "copy",                   # Copy video codec without re-encoding
+        "-c:a", "copy",                   # Copy audio codec without re-encoding
+        "-f", "hls",                      # Use HLS muxer instead of segment format
+        "-hls_time", str(CHUNK_DURATION), # Duration of each segment
+        "-hls_list_size", "0",            # Keep all segments in the playlist (for live streaming)
+        "-hls_segment_filename", segment_filename,  # Pattern for segment filenames
+        playlist_path
     ]
+
     process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     print(f"Video extraction started from {stream_url}")
 
