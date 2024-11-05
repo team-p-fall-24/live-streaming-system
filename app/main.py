@@ -5,6 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 from app.api.api_v1.api import api_router
 from fastapi.middleware.cors import CORSMiddleware
+from os import makedirs
 
 
 app = FastAPI()
@@ -24,6 +25,7 @@ app.include_router(api_router, prefix="/api/v1")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 # Mount the static directory to serve video chunks
+makedirs("app/media/chunks", exist_ok=True)
 app.mount("/media", StaticFiles(directory="app/media/chunks"), name="media")
 
 # Redirect root to the player page with an example .m3u8 URL (you can adjust this later)
