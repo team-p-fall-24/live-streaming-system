@@ -65,9 +65,10 @@ live-streaming-system/
 │   │   ├── subtitle_sync.py       # Pydantic schemas for subtitle synchronization
 │   ├── services/
 │   │   ├── __init__.py
-│   │   ├── live_stream_service.py # Business logic for live streaming
-│   │   ├── audio_service.py       # Business logic for audio processing
-│   │   ├── subtitle_service.py    # Business logic for subtitle synchronization
+│   │   ├── live_stream_service.py # Implementation logic for live stream service
+│   │   ├── audio_service.py       # Implementation logic for audio service
+│   │   ├── video_service.py       # Implementation logic for video service
+│   │   ├── stt_service.py         # Implementation logic for speech to text service
 │   ├── workers/
 │   │   ├── __init__.py
 │   │   ├── background_tasks.py    # Background task management
@@ -84,9 +85,7 @@ live-streaming-system/
 
 # How to test the current implementation
 
-Excute the .m3u8 input link via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_video__post`
-
-Then, open own player http://127.0.0.1:8000/static/player.html with this endpoint of livestreaming output
+Excute the .m3u8 input link via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post`. Then, open own player via http://127.0.0.1:8000/static/player.html by input this endpoint of livestreaming output
 ```
 http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8
 ```
