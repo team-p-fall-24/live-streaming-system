@@ -1,51 +1,33 @@
-import subprocess
+# audio_service.py
+
 import os
-import openai
-from app.services.stt_service import transcribe_audio_with_openai
+import subprocess
 
-def process_audio(stream_url: str):
-    try:
-        if not stream_url.endswith(".m3u8"):
-            raise ValueError("Provided URL is not an HLS (.m3u8) stream.")
+AUDIO_OUTPUT = "app/media/audio"
 
-        print(f"Processing HLS stream from {stream_url}...")
+def setup_audio_directory():
+    os.makedirs(AUDIO_OUTPUT, exist_ok=True)
 
-        # 10-second blocks.
-        output_pattern = "output_audio_segment_%03d.wav"
-        
-        # FFmpeg command to cut audio(10s)
-        command = [
-            "ffmpeg",
-            "-i", stream_url,  # Input HLS stream (.m3u8)
-            "-vn",  # No video, audio only
-            "-acodec", "pcm_s16le",  # WAV format
-            "-ar", "44100",  # Sample rate (44.1 kHz)
-            "-ac", "2",  # Stereo audio
-            "-f", "segment",  # Segment the audio
-            "-segment_time", "10",  # Cut into 10-second segments
-            "-reset_timestamps", "1",  # Reset timestamps for each segment
-            output_pattern  # Output file pattern
-        ]
-        
-        # Run FFmpeg command, create the audio segments
-        subprocess.run(command, check=True)
-        print(f"Audio segments saved as {output_pattern}")
+def segment_audio(stream_url: str, chunk_duration: int):
+    setup_audio_directory()
+    audio_segment_filename = os.path.join(AUDIO_OUTPUT, "audio_%d.wav")
 
-        # Now we process each segment using stt of openai
-        segment_index = 0
-        while True:
-            segment_file = f"output_audio_segment_{segment_index:03d}.wav"
-            if not os.path.exists(segment_file):
-                break  # No more segments to process
-            
-            print(f"Transcribing segment: {segment_file}")
-            transcription = transcribe_audio_with_openai(segment_file)
-            print(f"Transcription for {segment_file}: {transcription}")
+    command = [
+        "ffmpeg",
+        "-i", stream_url,
+        "-map", "0:a",
+        "-c:a", "pcm_s16le",
+        "-ar", "44100",
+        "-ac", "2",
+        "-f", "segment",
+        "-segment_time", str(chunk_duration),
+        "-reset_timestamps", "1",
+        audio_segment_filename
+    ]
 
-            # Save transcriptions
-            segment_index += 1
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    print("Audio segmentation started.")
 
-    except subprocess.CalledProcessError as e:
-        print(f"Error processing audio: {e}")
-    except ValueError as ve:
-        print(ve)
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        print(f"FFmpeg audio segmentation error: {stderr.decode()}")

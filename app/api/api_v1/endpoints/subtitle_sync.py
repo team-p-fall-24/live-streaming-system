@@ -1,10 +1,24 @@
 from fastapi import APIRouter, BackgroundTasks
 from app.schemas.subtitle_sync import SubtitleSyncRequest
-from app.services.subtitle_service import sync_subtitles
+from app.services.stt_service import transcribe_audio_with_openai
 
 router = APIRouter()
 
-@router.post("/sync")
-async def sync_subtitles_endpoint(request: SubtitleSyncRequest, background_tasks: BackgroundTasks):
-    background_tasks.add_task(sync_subtitles, request.stream_url, request.subtitle_file)
-    return {"message": "Subtitle synchronization started in the background"}
+@router.post("/transcribe")
+async def transcribe_audio_endpoint(request: SubtitleSyncRequest, background_tasks: BackgroundTasks):
+    """
+    Endpoint to transcribe an audio file asynchronously.
+
+    Args:
+        request (SubtitleSyncRequest): The request body containing the audio file path.
+        background_tasks (BackgroundTasks): FastAPI's background task manager.
+
+    Returns:
+        dict: A message indicating that the transcription task has started.
+    """
+    audio_file_path = request.audio_file_path
+
+    # Add the transcription task to run in the background
+    background_tasks.add_task(transcribe_audio_with_openai, audio_file_path)
+    
+    return {"message": f"Transcription started in the background for {audio_file_path}"}
