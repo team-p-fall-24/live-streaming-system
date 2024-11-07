@@ -11,7 +11,7 @@ PLAYLIST_OUTPUT = "app/media/playlists"
 PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
 
 # Configurable chunk duration in seconds
-CHUNK_DURATION = 10  # Adjust as needed
+CHUNK_DURATION = 10 # Currently use the 10-second chunk duration
 
 # Set up an executor for background tasks
 executor = ThreadPoolExecutor(max_workers=2)  # Allow both video and audio tasks
