@@ -5,6 +5,7 @@ import subprocess
 
 AUDIO_OUTPUT = "app/media/audio"
 
+# Ensure the audio output directory exists
 def setup_audio_directory():
     os.makedirs(AUDIO_OUTPUT, exist_ok=True)
 
