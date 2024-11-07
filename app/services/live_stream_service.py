@@ -1,3 +1,4 @@
+# service/live_stream_service.py
 import os
 import glob
 import time
@@ -62,7 +63,7 @@ def process_video_files():
         time.sleep(1)
 
 # Main function to start processing the video and audio streams
-def process_video(stream_url: str):
+def process_stream(stream_url: str):
     try:
         # Submit tasks for video and audio segmentation to the executor
         executor.submit(segment_video, stream_url, CHUNK_DURATION)
