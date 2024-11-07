@@ -6,11 +6,11 @@ import os
 router = APIRouter()
 
 # Endpoint to start processing the video stream
-@router.post("/process-video/")
+@router.post("/process-stream/")
 async def process_video_endpoint(background_tasks: BackgroundTasks, stream_url: str):
     try:    
         # Add the process_video function as a background task
-        background_tasks.add_task(live_stream_service.process_video, stream_url)
+        background_tasks.add_task(live_stream_service.process_stream, stream_url)
         return {"message": "Video stream processing started"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
