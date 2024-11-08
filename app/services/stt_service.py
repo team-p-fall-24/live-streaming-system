@@ -1,34 +1,32 @@
-import openai
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from openai import OpenAI
 
-# Load environment variables from the .env file
-load_dotenv()
+# Load the OPENAI_API_KEY from the .env file
+env_path = os.path.join(os.path.dirname(__file__), '../../.env')
+load_dotenv(env_path, override=True)
+api_key = os.getenv("OPENAI_API_KEY")
 
-# Set the OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
 
-# Function to transcribe audio using OpenAI's Whisper API
+# Function to transcribe an audio file using OpenAI API with the whisper-1 model
 def transcribe_audio_with_openai(audio_file: str) -> str:
     try:
-        with open(audio_file, "rb") as audio:
-            print(f"Transcribing the {audio_file}...")
-            transcription = openai.Audio.transcribe(
-                model="whisper-1",
-                file=audio,
-                response_format="text"
+        with open(audio_file, "rb") as file:
+            transcription = client.audio.transcriptions.create(
+                model="whisper-1", 
+                file=file
             )
-            print(f"Transcription successful for the {audio_file}")
-            return transcription
-    except openai.error.OpenAIError as oe:
-        print(f"OpenAI API error in transcription: {oe}")
-        return None
-    except FileNotFoundError:
-        print(f"File not found: {audio_file}")
-        return None
-    except IOError as ioe:
-        print(f"I/O error when handling {audio_file}: {ioe}")
-        return None
+        return transcription.text
     except Exception as e:
-        print(f"Unexpected error in transcription: {e}")
-        return None
+        print(f"An error occurred: {e}")
+        return ""
+
+
+# Testing the function
+if __name__ == "__main__":
+    audio_file_path = "audio.wav" # .wav file path to transcribe
+    transcription_text = transcribe_audio_with_openai(audio_file_path)
+    if transcription_text:
+        print(transcription_text)
