@@ -15,11 +15,11 @@ Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
 ### Project Configuration
 
 ```
-# Create vitural env
-python3 -m venv env
+# Create vitural venv
+python3 -m venv venv
 
 # Activate environment
-source env/bin/activate
+source venv/bin/activate
 
 # Install requirements
 pip3 install -r requirements.txt
@@ -89,3 +89,5 @@ Excute the .m3u8 input link via docs API `http://127.0.0.1:8000/docs#/live_strea
 ```
 http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8
 ```
+
+To test the stt_service.py, you need to add `OPENAI_API_KEY=your-api-key` in .env file. 
