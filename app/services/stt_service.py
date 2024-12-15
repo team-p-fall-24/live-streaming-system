@@ -34,7 +34,7 @@ def transcribe_audio(audio_file_path: str):
             )
 
         # Extract the transcription text
-        transcription_text = transcription.get("text", "")
+        transcription_text = transcription.text
         if not transcription_text:
             transcription_text = " "
         print("Extract text ", transcription_text)
@@ -53,7 +53,7 @@ def transcribe_audio(audio_file_path: str):
     finally:
         # Define the transcription file path
         transcription_file_path = (
-            f"{SUBTITLE_OUTPUT}/{os.path.splitext(os.path.basename(audio_file))[0]}.txt"
+            f"{SUBTITLE_OUTPUT}/{os.path.splitext(os.path.basename(audio_file_path))[0]}.txt"
         )
 
         # Save the transcription to a .txt file
@@ -102,12 +102,12 @@ if __name__ == "__main__":
         print(f"OpenAI Transcription: {transcription_text}")
     print(f"OpenAI Transcription Time: {openai_duration} seconds")
 
-    # Measure time for Groq transcription
-    audio_file_path_groq = "audio.wav"  # .m4a file path to transcribe
-    start_time = time.time()
-    transcription_text_groq = transcribe_audio_with_groq(audio_file=audio_file_path)
-    end_time = time.time()
-    groq_duration = end_time - start_time
-    if transcription_text_groq:
-        print(f"Groq Transcription: {transcription_text_groq}")
-    print(f"Groq Transcription Time: {groq_duration} seconds")
+    # # Measure time for Groq transcription
+    # audio_file_path_groq = "audio.wav"  # .m4a file path to transcribe
+    # start_time = time.time()
+    # transcription_text_groq = transcribe_audio_with_groq(audio_file=audio_file_path)
+    # end_time = time.time()
+    # groq_duration = end_time - start_time
+    # if transcription_text_groq:
+    #     print(f"Groq Transcription: {transcription_text_groq}")
+    # print(f"Groq Transcription Time: {groq_duration} seconds")

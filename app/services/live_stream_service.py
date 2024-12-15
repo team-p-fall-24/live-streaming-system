@@ -6,10 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 from app.services.stt_service import transcribe_audio
 from app.services.video_service import segment_video  # Import video segmentation
 from app.services.audio_service import segment_audio
-from app.variables import AUDIO_OUTPUT, VIDEO_OUTPUT, PLAYLIST_OUTPUT, PLAYLIST_FILE
-
-# Configurable chunk duration in seconds
-CHUNK_DURATION = 10 # Currently use the 10-second chunk duration
+from app.variables import AUDIO_OUTPUT, VIDEO_OUTPUT, PLAYLIST_OUTPUT, PLAYLIST_FILE, CHUNK_DURATION
 
 # Set up an executor for background tasks
 executor = ThreadPoolExecutor(max_workers=4)  # Allow both video and audio tasks
@@ -59,27 +56,27 @@ def process_video_files():
             update_m3u8_playlist()
         time.sleep(1)
 
-import logging
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
-)
+
 # Monitors and processes audio files, call the translation and update the .m3u8 file
 def process_audio_files():
+    def is_file_stable(file_path, wait_time=6):
+        initial_size = os.path.getsize(file_path)
+        time.sleep(wait_time)
+        final_size = os.path.getsize(file_path)
+        return initial_size == final_size
+    
     processed_files = set()
   
     while True:
-        files = sorted(glob.glob(f"{AUDIO_OUTPUT}/audio_*.wav"))
+        files = sorted(glob.glob(f"{AUDIO_OUTPUT}/audio_*.wav"), key=os.path.getctime) # make sure they should order the videos by time
         new_files = [file for file in files if file not in processed_files]
         if new_files:
             for file in new_files:
-                processed_files.add(file)
-                print(f"New audio file detected: {file}")
-                # transcribe something
-                transcribe_audio(file)
+                if is_file_stable(file):
+                    processed_files.add(file)
+                    print(f"New audio file detected: {file}")
+                    # transcribe something
+                    transcribe_audio(file)
 
         time.sleep(1)
 
