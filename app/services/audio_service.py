@@ -3,11 +3,12 @@
 import os
 import subprocess
 
-AUDIO_OUTPUT = "app/media/audio"
+from app.variables import AUDIO_OUTPUT, SUBTITLE_OUTPUT
 
-# Ensure the audio output directory exists
+# Ensure the audio output & transcription directory exists
 def setup_audio_directory():
     os.makedirs(AUDIO_OUTPUT, exist_ok=True)
+    os.makedirs(SUBTITLE_OUTPUT, exist_ok=True)
 
 def segment_audio(stream_url: str, chunk_duration: int):
     setup_audio_directory()

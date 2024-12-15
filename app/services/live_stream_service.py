@@ -3,19 +3,16 @@ import os
 import glob
 import time
 from concurrent.futures import ThreadPoolExecutor
+from app.services.stt_service import transcribe_audio
 from app.services.video_service import segment_video  # Import video segmentation
-from app.services.audio_service import segment_audio  # Import audio segmentation
-
-# Directories for storing video chunks and m3u8 files
-VIDEO_OUTPUT = "app/media/chunks"
-PLAYLIST_OUTPUT = "app/media/playlists"
-PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
+from app.services.audio_service import segment_audio
+from app.variables import AUDIO_OUTPUT, VIDEO_OUTPUT, PLAYLIST_OUTPUT, PLAYLIST_FILE
 
 # Configurable chunk duration in seconds
 CHUNK_DURATION = 10 # Currently use the 10-second chunk duration
 
 # Set up an executor for background tasks
-executor = ThreadPoolExecutor(max_workers=2)  # Allow both video and audio tasks
+executor = ThreadPoolExecutor(max_workers=4)  # Allow both video and audio tasks
 
 # Sets up the directory structure if it doesn't exist
 def setup_media_directories():
@@ -62,6 +59,31 @@ def process_video_files():
             update_m3u8_playlist()
         time.sleep(1)
 
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+# Monitors and processes audio files, call the translation and update the .m3u8 file
+def process_audio_files():
+    processed_files = set()
+  
+    while True:
+        files = sorted(glob.glob(f"{AUDIO_OUTPUT}/audio_*.wav"))
+        new_files = [file for file in files if file not in processed_files]
+        if new_files:
+            for file in new_files:
+                processed_files.add(file)
+                print(f"New audio file detected: {file}")
+                # transcribe something
+                transcribe_audio(file)
+
+        time.sleep(1)
+
+
 # Main function to start processing the video and audio streams
 def process_stream(stream_url: str):
     try:
@@ -71,6 +93,7 @@ def process_stream(stream_url: str):
         
         # Start background thread to process video files and update the playlist
         executor.submit(process_video_files)
+        executor.submit(process_audio_files)
         
         print(f"Processing started for {stream_url}")
     except Exception as e:
