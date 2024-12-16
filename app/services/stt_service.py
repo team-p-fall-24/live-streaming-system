@@ -85,11 +85,16 @@ def transcribe_audio_with_whisper_local(audio_file: str) -> str:
         device = "cuda" if torch.cuda.is_available() else "cpu"
         print(f"Using device: {device}")
 
-    except openai.OpenAIError as e:
-        # Handle errors from the OpenAI API
-        print(f"OpenAI API error during transcription of {audio_file_path}: {e}")
-        transcription_text = f"Error: {e}"
+        # Load the Whisper large model - turbo version is optimized for speed
+        model = whisper.load_model("turbo", device=device)
 
+        # Perform transcription
+        if(device == "cpu"):
+            result = model.transcribe(audio_file, fp16=False)
+        else:
+            result = model.transcribe(audio_file, fp16=True)
+        return result["text"]
     except Exception as e:
         print(f"An error occurred: {e}")
         return ""
+    
