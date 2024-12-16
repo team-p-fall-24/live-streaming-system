@@ -36,3 +36,4 @@ def segment_audio(stream_url: str, chunk_duration: int):
     stdout, stderr = process.communicate()
     if process.returncode != 0:
         print(f"FFmpeg audio segmentation error: {stderr.decode()}")
+        
