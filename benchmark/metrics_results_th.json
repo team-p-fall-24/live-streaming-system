@@ -1,0 +1,86 @@
+[
+    {
+        "file": "audio_0.txt",
+        "tfidf_similarity": 0.05783877580834689,
+        "chrf_score": 21.96680493137742,
+        "rouge_l": 0.6666666666666666,
+        "sbert_similarity": 0.656940221786499
+    },
+    {
+        "file": "audio_1.txt",
+        "tfidf_similarity": 0.09148659679401755,
+        "chrf_score": 41.100306366181336,
+        "rouge_l": 0,
+        "sbert_similarity": 0.4154074788093567
+    },
+    {
+        "file": "audio_10.txt",
+        "tfidf_similarity": 0.12735952979479354,
+        "chrf_score": 43.28511017451196,
+        "rouge_l": 0,
+        "sbert_similarity": 0.9918743968009949
+    },
+    {
+        "file": "audio_11.txt",
+        "tfidf_similarity": 0.370866700796636,
+        "chrf_score": 50.95378928000231,
+        "rouge_l": 1.0,
+        "sbert_similarity": 0.9760872721672058
+    },
+    {
+        "file": "audio_2.txt",
+        "tfidf_similarity": 0.2676228351019763,
+        "chrf_score": 40.01617328099514,
+        "rouge_l": 0,
+        "sbert_similarity": 0.7899300456047058
+    },
+    {
+        "file": "audio_3.txt",
+        "tfidf_similarity": 0.2563107276258884,
+        "chrf_score": 50.025429871832515,
+        "rouge_l": 0,
+        "sbert_similarity": 1.0
+    },
+    {
+        "file": "audio_4.txt",
+        "tfidf_similarity": 0.12110083055840204,
+        "chrf_score": 43.2634321629213,
+        "rouge_l": 0,
+        "sbert_similarity": 0.9578517079353333
+    },
+    {
+        "file": "audio_5.txt",
+        "tfidf_similarity": 0.1698272304629347,
+        "chrf_score": 35.25006506909819,
+        "rouge_l": 0,
+        "sbert_similarity": 0.4397650957107544
+    },
+    {
+        "file": "audio_6.txt",
+        "tfidf_similarity": 0.12015672417216715,
+        "chrf_score": 29.103744934406333,
+        "rouge_l": 1.0,
+        "sbert_similarity": 0.9107749462127686
+    },
+    {
+        "file": "audio_7.txt",
+        "tfidf_similarity": 0.21288995074902362,
+        "chrf_score": 54.07973585556118,
+        "rouge_l": 1.0,
+        "sbert_similarity": 1.0
+    },
+    {
+        "file": "audio_8.txt",
+        "tfidf_similarity": 0.12976885917595124,
+        "chrf_score": 39.1020997403004,
+        "rouge_l": 0,
+        "sbert_similarity": 0.9642842411994934
+    },
+    {
+        "file": "audio_9.txt",
+        "tfidf_similarity": 0.3562899285665559,
+        "chrf_score": 54.89581783930932,
+        "rouge_l": 0,
+        "sbert_similarity": 0.9268178939819336
+    }
+]
