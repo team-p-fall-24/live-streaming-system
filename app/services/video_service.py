@@ -13,7 +13,7 @@ def setup_video_directory():
 
 # Function to segment video from a streaming URL into chunks of a specified duration
 def segment_video(stream_url: str, chunk_duration: int):
-    # Ensure the necessary directoriloades are set up
+    # Ensure the necessary directories are set up
     setup_video_directory()
 
     # Define the path for the output playlist and video segments
