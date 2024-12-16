@@ -85,14 +85,37 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
     )
 
     for lang, translation in translations.items():
-        # Convert translation to WebVTT format
+        base_name = os.path.splitext(os.path.basename(input_file))[0]  # e.g., "audio_0"
+
+        # Extract the sequence number from the filename
+        try:
+            index = int(base_name.split('_')[1])
+            print(f"Translating chunk {index} to {lang}")
+        except (IndexError, ValueError):
+            index = 0  # Default to 0 if parsing fails
+
+        # Calculate start and end times
+        start_time_seconds = index * CHUNK_DURATION
+        end_time_seconds = (index + 1) * CHUNK_DURATION
+
+        # Function to format time in H:MM:SS.mmm
+        def format_time(seconds):
+            hours = int(seconds // 3600)
+            minutes = int((seconds % 3600) // 60)
+            secs = seconds % 60
+            return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
+
+        start_time = format_time(start_time_seconds)
+        end_time = format_time(end_time_seconds)
+
+        # Generate VTT content with accurate timing
         vtt_content = "WEBVTT\n\n"
-        vtt_content += f"00:00:00.000 --> 00:00:{CHUNK_DURATION:02d}.000\n"
+        vtt_content += f"{start_time} --> {end_time}\n"
         vtt_content += translation + "\n"
 
         output_file = os.path.join(
             TRANSLATION_OUTPUT,
-            f"{lang}/{os.path.splitext(os.path.basename(input_file))[0]}.vtt"
+            f"{lang}/{base_name}.vtt"
         )
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         try:
