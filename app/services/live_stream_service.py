@@ -12,7 +12,7 @@ from app.variables import AUDIO_OUTPUT, VIDEO_OUTPUT, PLAYLIST_OUTPUT, PLAYLIST_
 # Set up an executor for background tasks
 executor = ThreadPoolExecutor(max_workers=5)  # Allow both video and audio tasks
 
-# Sets up the directory structure if it doesn't exist
+# Automatically create the media directories if they don't exist
 def setup_media_directories():
     os.makedirs(VIDEO_OUTPUT, exist_ok=True)
     os.makedirs(PLAYLIST_OUTPUT, exist_ok=True)
@@ -86,15 +86,31 @@ def process_audio_files():
 
 # Monitors and processes subtitle files, call the translation service
 def process_translation_files():
+    def is_file_stable(file_path, wait_time=6):
+        initial_size = os.path.getsize(file_path)
+        time.sleep(wait_time)
+        final_size = os.path.getsize(file_path)
+        return initial_size == final_size and initial_size > 0
+
     processed_files = set()
     while True:
         files = sorted(glob.glob(f"{SUBTITLE_OUTPUT}/audio_*.txt"), key=os.path.getctime)
         new_files = [file for file in files if file not in processed_files]
         if new_files:
             for file in new_files:
-                processed_files.add(file)
-                print(f"New subtitle file detected: {file}")
-                translate_file(file)
+                if is_file_stable(file):
+                    processed_files.add(file)
+                    print(f"New subtitle file detected: {file}")
+                    translate_file(file)
+                else:
+                    # Wait additional 2 seconds and check again
+                    time.sleep(1)
+                    if is_file_stable(file, wait_time=2):
+                        processed_files.add(file)
+                        print(f"New subtitle file detected after additional wait: {file}")
+                        translate_file(file)
+                    else:
+                        print(f"Skipping empty subtitle file: {file}")
         time.sleep(1)
 
 # Main function to start processing the video and audio streams

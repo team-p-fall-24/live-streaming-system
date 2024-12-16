@@ -1,7 +1,7 @@
 import os
 import requests
 import json
-from dotenv import load_dotenvx
+from dotenv import load_dotenv
 from app.variables import TRANSLATION_OUTPUT
 
 # Load the XL8_API_KEY from the .env file
