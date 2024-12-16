@@ -104,7 +104,7 @@ OpenAI has a moderate performance, with an average time of 1.60 seconds. There i
 
 Whisper Local is significantly slower, averaging 13.47 seconds per file. It shows a clear downward trend initially, stabilizing around 13–14 seconds after audio_2.wav.
 
-![Transcription Time Metrics](metrics_transcription_time.png)
+![Transcription Time Metrics](./benchmarking/results/metrics_transcription_time.png)
 
 # Benchmarking Results for Translation
 
@@ -124,8 +124,8 @@ Then, we use the following metrics for comparing the similarity between translat
 
 ### Results for Korean to Vietnamese Translation
 
-![Metric Visualization Korean to Vietnamese](metrics_visualization_vi.png)
+![Metric Visualization Korean to Vietnamese](./benchmarking/results/metrics_visualization_vi.png)
 
 ### Results for Korean to Thai Translation
 
-![Metric Visualization Korean to Thai](metrics_visualization_th.png)
+![Metric Visualization Korean to Thai](./benchmarking/results/metrics_visualization_th.png)
