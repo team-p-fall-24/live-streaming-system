@@ -83,19 +83,26 @@ live-streaming-system/
 └── README.md                      # Project documentation
 ```
 
-# How to test the current implementation
+# Testing Guide
 
-Excute the .m3u8 input link via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post`. Then, open own player via http://127.0.0.1:8000/static/player.html by input this endpoint of livestreaming output
+Copy `.env.example` and rename it as `.env` and add the API key into this environment variable file. 
+
+Run server with this command
+
 ```
-http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8
+uvicorn app.main:app --reload
 ```
 
-To test the stt_service.py, you need to add `OPENAI_API_KEY=your-api-key` in .env file. 
+Excute the .m3u8 input link (e.g `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`
+) via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post`. 
 
+Open own self-made player (User View) via http://127.0.0.1:8000/static/player.html or VLC Media Play or any Player. 
 
-### Benchmarking Results
+Input our server endpoint ``http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8` to see the processed streaming video:
 
-# Benchmarking Results for Speech to Text 
+# Benchmarking Results
+
+## Benchmarking Results for Speech to Text 
 We ran 12 audio files with a total duration of 2 minutes.
 
 Groq consistently has the lowest transcription time, averaging 0.46 seconds, with little variation across all audio files.
@@ -106,7 +113,7 @@ Whisper Local is significantly slower, averaging 13.47 seconds per file. It show
 
 ![Transcription Time Metrics](./benchmarking/results/metrics_transcription_time.png)
 
-# Benchmarking Results for Translation
+## Benchmarking Results for Translation
 
 For benchmarking the translation output, we prepared 12 .txt files in the subtitles folder. Each file is the output of text to speech service from 10 seconds length. Thus, total length of audio for evaluation is 2 minutes.
 
@@ -122,10 +129,10 @@ Then, we use the following metrics for comparing the similarity between translat
 
 - SBERT (Sentence-BERT) measures the semantic similarity between two texts. It evaluates whether two sentences have the same meaning, regardless of word order or word choice. (Using Sentence Transformer model)
 
-### Results for Korean to Vietnamese Translation
+#### Results for Korean to Vietnamese Translation
 
 ![Metric Visualization Korean to Vietnamese](./benchmarking/results/metrics_visualization_vi.png)
 
-### Results for Korean to Thai Translation
+#### Results for Korean to Thai Translation
 
 ![Metric Visualization Korean to Thai](./benchmarking/results/metrics_visualization_th.png)
