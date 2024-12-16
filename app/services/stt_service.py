@@ -1,40 +1,68 @@
 import os
 import time
-import whisper
 import torch
-import warnings
-from dotenv import load_dotenv
-from openai import OpenAI
+import whisper
+import openai
 from groq import Groq
-
-# Ignore the warning when using CPU
-warnings.filterwarnings("ignore", message="You are using `torch.load` with `weights_only=False`")
+from dotenv import load_dotenv
+from app.variables import SUBTITLE_OUTPUT
 
 # Load the OPENAI_API_KEY from the .env file
-env_path = os.path.join(os.path.dirname(__file__), '../../.env')
+env_path = os.path.join(os.path.dirname(__file__), "../../.env")
 load_dotenv(env_path, override=True)
 api_key = os.getenv("OPENAI_API_KEY")
 groq_api_key = os.getenv("GROQ_API_KEY")
 
 # Initialize the OpenAI client
-client = OpenAI(api_key=api_key)
+client = openai.OpenAI(api_key=api_key)
 
 # Initialize the Groq client
 groq_client = Groq(api_key=groq_api_key)
 
-# Function to transcribe an audio file using OpenAI API with the whisper large model
-def transcribe_audio_with_openai(audio_file: str) -> str:
-    try:
-        with open(audio_file, "rb") as file:
-            transcription = client.audio.transcriptions.create(
-                model="whisper-1", 
-                file=file
-            )
-        return transcription.text
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        return ""
+# Function to transcribe audio file with fallback to Groq after 3 OpenAI failures
+def transcribe_audio(audio_file_path: str):
+    """Transcribe a wav audio file to text and save to the file, with fallback to Groq"""
+    max_retries = 3
+    retries = 0
+    transcription_text = ""
 
+    # Ensure the audio file exists
+    if not os.path.exists(audio_file_path):
+        print(f"Audio file does not exist: {audio_file_path}")
+        return
+
+    # Try transcribing with OpenAI API
+    while retries < max_retries:
+        try:
+            with open(audio_file_path, "rb") as audio_file:
+                transcription = client.audio.transcriptions.create(
+                    model="whisper-1", file=audio_file
+                )
+            transcription_text = transcription.text or " "
+            print("Extract text: ", transcription_text)
+            break
+        except openai.OpenAIError as e:
+            retries += 1
+            print(f"OpenAI API error (attempt {retries}) during transcription of {audio_file_path}: {e}")
+        except Exception as e:
+            retries += 1
+            print(f"Unexpected error (attempt {retries}) during transcription of {audio_file_path}: {e}")
+
+    # If OpenAI fails after retries, fallback to Groq
+    if retries == max_retries:
+        print("Falling back to Groq API for transcription.")
+        transcription_text = transcribe_audio_with_groq(audio_file_path)
+
+    # Define the transcription file path
+    transcription_file_path = (
+        f"{SUBTITLE_OUTPUT}/{os.path.splitext(os.path.basename(audio_file_path))[0]}.txt"
+    )
+
+    # Save the transcription to a .txt file
+    with open(transcription_file_path, "w", encoding="utf-8") as txt_file:
+        txt_file.write(transcription_text.strip())
+
+# Additional functions to support the STT services for other use cases
 # Function to transcribe an audio file using Groq API with the whisper large model
 def transcribe_audio_with_groq(audio_file: str) -> str:
     try:
@@ -68,40 +96,4 @@ def transcribe_audio_with_whisper_local(audio_file: str) -> str:
     except Exception as e:
         print(f"An error occurred: {e}")
         return ""
-
-# Testing the function
-if __name__ == "__main__":
-    audio_file_path = "../media/example-usage/audio_input.wav" # .wav file path to transcribe
     
-    # Measure time for OpenAI transcription
-    try:
-        start_time = time.time()
-        transcription_text = transcribe_audio_with_openai(audio_file_path)
-        openai_duration = time.time() - start_time
-        if transcription_text:
-            print(f"OpenAI Transcription: {transcription_text}")
-        print(f"OpenAI Transcription Time: {openai_duration:.2f} seconds")
-    except Exception as e:
-        print(f"OpenAI Transcription Error: {e}")
-
-    # Measure time for Groq transcription
-    try:
-        start_time = time.time()
-        transcription_text_groq = transcribe_audio_with_groq(audio_file_path)
-        groq_duration = time.time() - start_time
-        if transcription_text_groq:
-            print(f"Groq Transcription: {transcription_text_groq}")
-        print(f"Groq Transcription Time: {groq_duration:.2f} seconds")
-    except Exception as e:
-        print(f"Groq Transcription Error: {e}")
-
-    # Measure time for Whisper local transcription
-    try:
-        start_time = time.time()
-        transcription_text_whisper_local = transcribe_audio_with_whisper_local(audio_file_path)
-        whisper_local_duration = time.time() - start_time
-        if transcription_text_whisper_local:
-            print(f"Whisper Local Transcription: {transcription_text_whisper_local}")
-        print(f"Whisper Local Transcription Time: {whisper_local_duration:.2f} seconds")
-    except Exception as e:
-        print(f"Whisper Local Transcription Error: {e}")
