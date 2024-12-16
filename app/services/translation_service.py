@@ -1,7 +1,8 @@
 import os
 import requests
 import json
-from dotenv import load_dotenv
+from dotenv import load_dotenvx
+from app.variables import TRANSLATION_OUTPUT
 
 # Load the XL8_API_KEY from the .env file
 env_path = os.path.join(os.path.dirname(__file__), '../../.env')
@@ -59,33 +60,32 @@ def translate_text(input_text: str, source_language: str = "ko", target_language
     
     return translations
 
-# Example of usage and testing the translation service
-if __name__ == "__main__":
-    # Read input text from a file
-    input_file = "../media/example-usage/translation_input.txt"
+def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
+    """
+    Translates the content of a text file and saves the translations to separate files.
+
+    Args:
+        input_file (str): Path to the input text file.
+        source_language (str): The source language code (default is "ko").
+        target_languages (list): A list of target language codes.
+        formality (str): Formality level for translation ("HAEYO" or others).
+    """
     try:
         with open(input_file, "r", encoding="utf-8") as file:
             input_text = file.read().strip()
     except IOError as e:
         print(f"Error reading from file {input_file}: {e}")
-        exit(1)
-    
-    source_language = "ko"
-    target_languages = ["vi", "th"]  # Vietnamese and Thai
-    
-    # Get translations
-    translations = translate_text(input_text, source_language=source_language, target_languages=target_languages)
-    
-    # Print the translations to the console
+        return
+
+    translations = translate_text(input_text, source_language=source_language, target_languages=target_languages, formality=formality)
+
     for lang, translation in translations.items():
-        print(f"{lang}: {translation}")
-    
-    # Save translations to a file
-    output_file = "../media/example-usage/translation_output.txt"
-    try:
-        with open(output_file, "w", encoding="utf-8") as file:
-            for lang, translation in translations.items():
-                file.write(f"{lang}: {translation}\n")
-        print(f"Translations saved to {output_file}")
-    except IOError as e:
-        print(f"Error writing to file {output_file}: {e}")
+        output_file = os.path.join(TRANSLATION_OUTPUT, f"{lang}/{os.path.basename(input_file)}")
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        try:
+            with open(output_file, "w", encoding="utf-8") as file:
+                file.write(translation)
+            print(f"Translation saved to {output_file}")
+        except IOError as e:
+            print(f"Error writing to file {output_file}: {e}")
+

@@ -7,6 +7,7 @@ load_dotenv()
 AUDIO_OUTPUT = os.getenv("AUDIO_OUTPUT")
 VIDEO_OUTPUT = os.getenv("VIDEO_OUTPUT")
 SUBTITLE_OUTPUT = os.getenv("SUBTITLE_OUTPUT")
+TRANSLATION_OUTPUT = os.getenv("TRANSLATION_OUTPUT")
 PLAYLIST_OUTPUT = os.getenv("PLAYLIST_OUTPUT")
 PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
 # Configurable chunk duration in seconds
