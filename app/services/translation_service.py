@@ -2,6 +2,7 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
+from app.variables import TRANSLATION_OUTPUT, CHUNK_DURATION
 
 # Load the XL8_API_KEY from the .env file
 env_path = os.path.join(os.path.dirname(__file__), '../../.env')
@@ -59,33 +60,68 @@ def translate_text(input_text: str, source_language: str = "ko", target_language
     
     return translations
 
-# Example of usage and testing the translation service
-if __name__ == "__main__":
-    # Read input text from a file
-    input_file = "../media/example-usage/translation_input.txt"
+def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
+    """
+    Translates the content of a text file and saves the translations to .vtt files.
+
+    Args:
+        input_file (str): Path to the input text file.
+        source_language (str): The source language code (default is "ko").
+        target_languages (list): A list of target language codes.
+        formality (str): Formality level for translation ("HAEYO" or others).
+    """
     try:
         with open(input_file, "r", encoding="utf-8") as file:
             input_text = file.read().strip()
     except IOError as e:
         print(f"Error reading from file {input_file}: {e}")
-        exit(1)
-    
-    source_language = "ko"
-    target_languages = ["vi", "th"]  # Vietnamese and Thai
-    
-    # Get translations
-    translations = translate_text(input_text, source_language=source_language, target_languages=target_languages)
-    
-    # Print the translations to the console
+        return
+
+    translations = translate_text(
+        input_text,
+        source_language=source_language,
+        target_languages=target_languages,
+        formality=formality
+    )
+
     for lang, translation in translations.items():
-        print(f"{lang}: {translation}")
-    
-    # Save translations to a file
-    output_file = "../media/example-usage/translation_output.txt"
-    try:
-        with open(output_file, "w", encoding="utf-8") as file:
-            for lang, translation in translations.items():
-                file.write(f"{lang}: {translation}\n")
-        print(f"Translations saved to {output_file}")
-    except IOError as e:
-        print(f"Error writing to file {output_file}: {e}")
+        base_name = os.path.splitext(os.path.basename(input_file))[0]  # e.g., "audio_0"
+
+        # Extract the sequence number from the filename
+        try:
+            index = int(base_name.split('_')[1])
+            print(f"Translating chunk {index} to {lang}")
+        except (IndexError, ValueError):
+            index = 0  # Default to 0 if parsing fails
+
+        # Calculate start and end times
+        start_time_seconds = index * CHUNK_DURATION
+        end_time_seconds = (index + 1) * CHUNK_DURATION
+
+        # Function to format time in H:MM:SS.mmm
+        def format_time(seconds):
+            hours = int(seconds // 3600)
+            minutes = int((seconds % 3600) // 60)
+            secs = seconds % 60
+            return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
+
+        start_time = format_time(start_time_seconds)
+        end_time = format_time(end_time_seconds)
+
+        # Generate VTT content with accurate timing
+        vtt_content = "WEBVTT\n\n"
+        vtt_content += f"{start_time} --> {end_time}\n"
+        vtt_content += translation + "\n"
+
+        output_file = os.path.join(
+            TRANSLATION_OUTPUT,
+            f"{lang}/{base_name}.vtt"
+        )
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        try:
+            with open(output_file, "w", encoding="utf-8") as file:
+                file.write(vtt_content)
+            print(f"Translation saved to {output_file}")
+        except IOError as e:
+            print(f"Error writing to file {output_file}: {e}")
+
