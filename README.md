@@ -125,7 +125,7 @@ Then, we use the following metrics for comparing the similarity between translat
 
 - ChrF measures the similarity between two texts at the character level, which makes it more robust to paraphrasing, word reordering, and morphological variations.
 
-- ROUGE-L evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment. Note that because Thai language doeen't use space for does not use spaces to separate words. Thus, we don't consider this metrics for Thai language.
+- ROUGE-L evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment. Note that because Thai language does not use spaces to separate words. Therefore, the ROUGE-L metric is less useful for Thai language.
 
 - SBERT (Sentence-BERT) measures the semantic similarity between two texts. It evaluates whether two sentences have the same meaning, regardless of word order or word choice. (Using Sentence Transformer model)
 
