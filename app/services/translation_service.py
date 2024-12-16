@@ -2,7 +2,7 @@ import os
 import requests
 import json
 from dotenv import load_dotenv
-from app.variables import TRANSLATION_OUTPUT
+from app.variables import TRANSLATION_OUTPUT, CHUNK_DURATION
 
 # Load the XL8_API_KEY from the .env file
 env_path = os.path.join(os.path.dirname(__file__), '../../.env')
@@ -62,7 +62,7 @@ def translate_text(input_text: str, source_language: str = "ko", target_language
 
 def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
     """
-    Translates the content of a text file and saves the translations to separate files.
+    Translates the content of a text file and saves the translations to .vtt files.
 
     Args:
         input_file (str): Path to the input text file.
@@ -77,14 +77,27 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
         print(f"Error reading from file {input_file}: {e}")
         return
 
-    translations = translate_text(input_text, source_language=source_language, target_languages=target_languages, formality=formality)
+    translations = translate_text(
+        input_text,
+        source_language=source_language,
+        target_languages=target_languages,
+        formality=formality
+    )
 
     for lang, translation in translations.items():
-        output_file = os.path.join(TRANSLATION_OUTPUT, f"{lang}/{os.path.basename(input_file)}")
+        # Convert translation to WebVTT format
+        vtt_content = "WEBVTT\n\n"
+        vtt_content += f"00:00:00.000 --> 00:00:{CHUNK_DURATION:02d}.000\n"
+        vtt_content += translation + "\n"
+
+        output_file = os.path.join(
+            TRANSLATION_OUTPUT,
+            f"{lang}/{os.path.splitext(os.path.basename(input_file))[0]}.vtt"
+        )
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         try:
             with open(output_file, "w", encoding="utf-8") as file:
-                file.write(translation)
+                file.write(vtt_content)
             print(f"Translation saved to {output_file}")
         except IOError as e:
             print(f"Error writing to file {output_file}: {e}")
