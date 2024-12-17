@@ -22,7 +22,7 @@ def setup_media_directories():
 
 def create_vtt(language_code):
     try:
-        subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language_code}/audio_*.vtt"))
+        subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language_code}/audio_*.vtt"), key=os.path.getctime)
         
         if not subtitle_files:
             print(f"No subtitle files found to create {language_code}.vtt file.")
@@ -48,7 +48,7 @@ def create_vtt(language_code):
 # Function to update the m3u8 playlist file dynamically
 def update_m3u8_playlist():
     try:
-        chunk_files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"))
+        chunk_files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"), key=os.path.getctime)
         if not chunk_files:
             print("No video chunks found to create m3u8 file.")
             return
@@ -80,7 +80,7 @@ def update_m3u8_playlist():
 def process_video_files():
     processed_files = set()
     while True:
-        files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"))
+        files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"), key=os.path.getctime)
         new_files = [file for file in files if file not in processed_files]
         if new_files:
             for file in new_files:
