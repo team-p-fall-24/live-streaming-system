@@ -20,6 +20,31 @@ def setup_media_directories():
     os.makedirs(SUBTITLE_OUTPUT, exist_ok=True)
     os.makedirs(TRANSLATION_OUTPUT, exist_ok=True)
 
+def create_vtt(language_code):
+    try:
+        subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language_code}/audio_*.vtt"))
+        
+        if not subtitle_files:
+            print(f"No subtitle files found to create {language_code}.vtt file.")
+            return
+
+        vtt_content = "WEBVTT\n\n"
+
+        for subtitle_file in subtitle_files:
+            with open(subtitle_file, "r") as f:
+                lines = f.readlines()
+                # Skip the first line if it is "WEBVTT"
+                if lines[0].strip() == "WEBVTT":
+                    lines = lines[1:]
+                vtt_content += "".join(lines) + "\n"
+
+        with open(f"{TRANSLATION_OUTPUT}/{language_code}.vtt", "w") as f:
+            f.write(vtt_content)
+        print(f"Created {language_code}.vtt file with {len(subtitle_files)} subtitles.")
+
+    except Exception as e:
+        print(f"Error creating {language_code}.vtt file: {e}")
+
 # Function to update the m3u8 playlist file dynamically
 def update_m3u8_playlist():
     try:
@@ -38,11 +63,15 @@ def update_m3u8_playlist():
 
         for chunk_file in chunk_files:
             chunk_filename = os.path.basename(chunk_file)
-            m3u8_content += f"#EXTINF:{CHUNK_DURATION},\n/api/v1/live/chunks/{chunk_filename}\n"
+            m3u8_content += f"#EXTINF:{CHUNK_DURATION},\n/api/v1/streaming/chunks/{chunk_filename}\n"
 
         with open(PLAYLIST_FILE, "w") as f:
             f.write(m3u8_content)
         print(f"Updated m3u8 file with {len(chunk_files)} chunks.")
+        
+        # Create the .vtt files for Vietnamese and Thai subtitles
+        create_vtt("vi")
+        create_vtt("th")
 
     except Exception as e:
         print(f"Error updating m3u8 file: {e}")
