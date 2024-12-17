@@ -139,7 +139,7 @@ We use the following metrics to compare the similarity between translations:
 
 ![Metric Visualization Korean to Thai](./benchmarking/results/metrics_visualization_th.png)
 
-### Benchmarking Results for Speech-to-text (Using XL8.ai comparing between cut down and full duration translation)
+### Benchmarking Results for Speech-to-text (Using XL8.ai comparing between 10-second-segmentation and full duration translation)
 
 In this second experiment, we benchmark the translation quality between the 10 segmentation and full size duration. For full size duration, we translate 2-minute-audio using both service. On the other hand, we merged the translation results of 12 10-second-segmentation. Then comparing using the above method
 
