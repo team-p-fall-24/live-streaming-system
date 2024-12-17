@@ -20,6 +20,8 @@ def setup_media_directories():
     os.makedirs(SUBTITLE_OUTPUT, exist_ok=True)
     os.makedirs(TRANSLATION_OUTPUT, exist_ok=True)
 
+setup_media_directories()
+
 # Function to update the m3u8 playlist file dynamically
 def update_m3u8_playlist():
     try:
@@ -31,14 +33,24 @@ def update_m3u8_playlist():
         media_sequence = int(os.path.splitext(os.path.basename(chunk_files[0]))[0].split('_')[1])
 
         m3u8_content = "#EXTM3U\n"
-        m3u8_content += "#EXT-X-VERSION:3\n"
-        m3u8_content += "#EXT-X-PLAYLIST-TYPE:LIVE\n"
-        m3u8_content += f"#EXT-X-TARGETDURATION:{CHUNK_DURATION}\n"
-        m3u8_content += f"#EXT-X-MEDIA-SEQUENCE:{media_sequence}\n\n"
+        # m3u8_content += "#EXT-X-PLAYLIST-TYPE:LIVE\n"
+        # m3u8_content += f"#EXT-X-TARGETDURATION:{CHUNK_DURATION}\n"
+        # m3u8_content += f"#EXT-X-MEDIA-SEQUENCE:{media_sequence}\n\n"
+
+        # Step 3: Add subtitle tracks dynamically
+        subtitle_languages = ["vi", "th"]  # Example: Vietnamese and Thai
+        for lang in subtitle_languages:
+            subtitle_playlist_path = f"{PLAYLIST_OUTPUT}/{lang}_sub.m3u8"
+            if os.path.exists(subtitle_playlist_path):
+                m3u8_content += (
+                    f'#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",LANGUAGE="{lang}",'
+                    f'NAME="{lang.upper()}",AUTOSELECT=YES,DEFAULT=NO,URI="/api/v1/live/subtitles/{lang}"\n\n'
+                )
 
         for chunk_file in chunk_files:
             chunk_filename = os.path.basename(chunk_file)
-            m3u8_content += f"#EXTINF:{CHUNK_DURATION},\n/api/v1/live/chunks/{chunk_filename}\n"
+            # m3u8_content += f'#EXTINF:{CHUNK_DURATION},SUBTITLES="subs"\n/api/v1/live/chunks/{chunk_filename}\n'
+            m3u8_content += f'#EXT-X-STREAM-INF:SUBTITLES="subs"\n/api/v1/live/chunks/{chunk_filename}\n'
 
         with open(PLAYLIST_FILE, "w") as f:
             f.write(m3u8_content)
@@ -84,7 +96,7 @@ def process_audio_files():
 
         time.sleep(1)
 
-# Monitors and processes subtitle files, call the translation service
+# Monitors and processes subtitle files, call the translation service, and update the translation .m3u8 file
 def process_translation_files():
     def is_file_stable(file_path, wait_time=6):
         initial_size = os.path.getsize(file_path)

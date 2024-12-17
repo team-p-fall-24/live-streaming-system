@@ -45,3 +45,33 @@ async def get_chunk(filename: str):
         return FileResponse(file_path, headers=headers, media_type="video/MP2T")
     else:
         raise HTTPException(status_code=404, detail="Chunk file not found")
+
+# Endpoint to serve subtitle files
+@router.get("/subtitles/{language}")
+async def get_subtitle(language: str):
+    subtitle_path = f"app/media/playlists/{language}_sub.m3u8"
+    if os.path.isfile(subtitle_path):
+        headers = {
+            "Content-Type": "text/vtt",  # Correct MIME type for WebVTT
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        return FileResponse(subtitle_path, headers=headers, media_type="text/vtt")
+    else:
+        raise HTTPException(status_code=404, detail="Subtitle file not found")
+
+# Endpoint to serve individual translation chunks
+@router.get("/{language}/{filename}")
+async def get_translation_audio(language: str, filename: str):
+    subtitle_path = f"app/media/translations/{language}/{filename}"
+    if os.path.isfile(subtitle_path):
+        headers = {
+            "Content-Type": "text/vtt",  # Correct MIME type for WebVTT
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        return FileResponse(subtitle_path, headers=headers, media_type="text/vtt")
+    else:
+        raise HTTPException(status_code=404, detail="Subtitle file not found")

@@ -1,13 +1,17 @@
+import glob
 import os
 import requests
 import json
 from dotenv import load_dotenv
-from app.variables import TRANSLATION_OUTPUT, CHUNK_DURATION
+from app.variables import PLAYLIST_OUTPUT, TRANSLATION_OUTPUT, CHUNK_DURATION
 
 # Load the XL8_API_KEY from the .env file
 env_path = os.path.join(os.path.dirname(__file__), '../../.env')
 load_dotenv(env_path, override=True)
 api_key = os.getenv("XL8_API_KEY")
+
+VIET_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "vietsub.m3u8")
+THAI_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "thaisub.m3u8")
 
 if not api_key:
     raise ValueError("API key not found. Please check your .env file.")
@@ -60,6 +64,25 @@ def translate_text(input_text: str, source_language: str = "ko", target_language
     
     return translations
 
+def generate_subtitle_playlist(language: str):
+    """Generate .m3u8 playlist for translated subtitles."""
+    subtitle_file = f"{PLAYLIST_OUTPUT}/{language}_sub.m3u8"
+
+    subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language}/audio_*.vtt"), key=os.path.getctime)
+    m3u8_content = "#EXTM3U\n"
+    m3u8_content += "#EXT-X-PLAYLIST-TYPE:VOD\n"
+    m3u8_content += f"#EXT-X-TARGETDURATION:{CHUNK_DURATION}\n"
+    m3u8_content += f"#EXT-X-VERSION:3\n"
+    m3u8_content += "#EXT-X-MEDIA-SEQUENCE:0\n\n"
+
+    for file in subtitle_files:
+        filename = os.path.basename(file)
+        m3u8_content += f"#EXTINF:{CHUNK_DURATION},\n/api/v1/live/{language}/{filename}\n"
+    
+    with open(subtitle_file, "w") as f:
+        f.write(m3u8_content)
+    print(f"Updated {language} subtitle m3u8 file with {len(subtitle_files)} chunks.")
+
 def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
     """
     Translates the content of a text file and saves the translations to .vtt files.
@@ -98,6 +121,8 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
         start_time_seconds = index * CHUNK_DURATION
         end_time_seconds = (index + 1) * CHUNK_DURATION
 
+        # update_to_global_vtt(language=lang, translation=translation, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds)
+
         # Function to format time in H:MM:SS.mmm
         def format_time(seconds):
             hours = int(seconds // 3600)
@@ -124,4 +149,7 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
             print(f"Translation saved to {output_file}")
         except IOError as e:
             print(f"Error writing to file {output_file}: {e}")
+    
+    for lang in target_languages:
+        generate_subtitle_playlist(language=lang)
 
