@@ -1,0 +1,8 @@
+[
+    {
+        "tfidf_similarity": 0.7191043412585604,
+        "chrf_score": 72.48674400151766,
+        "rouge_l": 0.5,
+        "sbert_similarity": 0.865495502948761
+    }
+]
