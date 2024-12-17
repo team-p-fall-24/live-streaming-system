@@ -80,11 +80,11 @@ def process_single_file(input_file: str, output_folder_xl8: str, output_folder_o
 
 # Main Execution
 if __name__ == "__main__":
-    input_file = "./benchmarking/full-duration-output/full_subtitle.txt"  # Full subtitle file
-    output_folder_xl8 = "./translate-xl8-vi"  # Folder to save XL8 translations
-    output_folder_openai = "./translate-openai-vi"  # Folder to save OpenAI translations
+    input_file = "full-duration-output/full_subtitle.txt"  # Full subtitle file
+    output_folder_xl8 = "full-duration-output/translate-xl8-th"  # Folder to save XL8 translations
+    output_folder_openai = "full-duration-output/translate-openai-th"  # Folder to save OpenAI translations
     source_language = "ko"  # Source language (Korean)
-    target_language = "vi"  # Target language (Vietnamese)
+    target_language = "th"  # Target language (Vietnamese)
 
     # Translate and save the file
     process_single_file(input_file, output_folder_xl8, output_folder_openai, source_language, target_language)
