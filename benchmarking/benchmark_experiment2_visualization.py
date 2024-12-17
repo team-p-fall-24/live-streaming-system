@@ -24,7 +24,7 @@ def visualize_and_save_metrics(dfs, output_folder):
 
     for language in languages:
         fig, axes = plt.subplots(2, 2, figsize=(14, 12))  # 2 rows, 2 columns grid
-        fig.suptitle(f"Comparing Translation Similarity Metrics Between 10 Seconds Segmentation and Full length for {language}", fontsize=16)
+        fig.suptitle(f"Comparing Translation Similarity Metrics Between 10 Seconds Segmentation and Full Length for 2 Minutes of {language}", fontsize=16)
 
         # Filter DataFrames for the current language
         language_dfs = [(df, label) for df, label in dfs if language in label]
