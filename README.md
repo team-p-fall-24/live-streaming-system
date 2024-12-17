@@ -1,21 +1,20 @@
-# Real-time live streaming multilingual subtitles system
+# Real-time Live Streaming Multilingual Subtitles System
 
-## Prerequisite and installation
+## Prerequisite and Installation
 
 Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
 
 ### Required Libraries
 
-#### FFmpeg library
+#### FFmpeg Library
 
 - For Mac, please use `brew install ffmpeg`
-
-- To deploy on Linux server, we need to follow this guideline https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg for install latest version instead of using apt install.
+- To deploy on a Linux server, follow this guideline: [FFmpeg Compilation Guide for Ubuntu](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg) to install the latest version instead of using `apt install`.
 
 ### Project Configuration
 
-```
-# Create vitural venv
+```bash
+# Create virtual environment
 python3 -m venv venv
 
 # Activate environment
@@ -24,21 +23,21 @@ source venv/bin/activate
 # Install requirements
 pip3 install -r requirements.txt
 
-# If there exists additional install library when developing, please update requirements.txt
+# If there are additional libraries installed during development, please update requirements.txt
 pip3 freeze > requirements.txt
 ```
 
-Run server
+### Running the Server
 
-```
+```bash
 uvicorn app.main:app --reload
 ```
 
-Swagger UI for API docs can be checked via http://127.0.0.1:8000/docs
+Swagger UI for API documentation can be accessed at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ## Project Structure Overview
 
-```
+```plaintext
 live-streaming-system/
 ├── app/
 │   ├── __init__.py                # Initialization file for the app module
@@ -54,21 +53,25 @@ live-streaming-system/
 │   │   │   ├── endpoints/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── live_stream.py # Endpoints related to live streaming
-│   │   │   │   ├── audio_processing.py # Endpoints related to audio processing
-│   │   │   │   ├── subtitle_sync.py    # Endpoints related to subtitle synchronization
+│   ├── media/
+│   │   ├── audio                  # Store the audio segmentation
+|   |   ├── chunks                 # Store the video segmentation
+|   |   ├── playlists              # Store the playlist.m3u8 ~ Output file of our service
+|   |   ├── subtitles              # Store the subtitles (Output from Whisper model)
+|   |   ├── translations           # Store the translation (Having sub folder based on language code `vi`, `th`)
 │   ├── models/
 │   │   ├── __init__.py            # Placeholder for database models
 │   ├── schemas/
 │   │   ├── __init__.py
 │   │   ├── live_stream.py         # Pydantic schemas for live streaming
-│   │   ├── audio_processing.py    # Pydantic schemas for audio processing
-│   │   ├── subtitle_sync.py       # Pydantic schemas for subtitle synchronization
 │   ├── services/
 │   │   ├── __init__.py
 │   │   ├── live_stream_service.py # Implementation logic for live stream service
 │   │   ├── audio_service.py       # Implementation logic for audio service
 │   │   ├── video_service.py       # Implementation logic for video service
-│   │   ├── stt_service.py         # Implementation logic for speech to text service
+│   │   ├── stt_service.py         # Implementation logic for speech-to-text service
+│   │   ├── translation_service.py # Implementation logic for translation service
+│   ├── static/                    # Storing our frontend implementation using HLS library for demo as user side using our API endpoint
 │   ├── workers/
 │   │   ├── __init__.py
 │   │   ├── background_tasks.py    # Background task management
@@ -76,6 +79,8 @@ live-streaming-system/
 │       ├── __init__.py
 │       ├── base.py                # Base model class for ORM
 │       └── session.py             # Database session management
+├── benchmarking/
+│   ├── results/                   # Folder containing benchmarking results
 ├── .env                           # Environment variables
 ├── .gitignore                     # Git ignore file
 ├── requirements.txt               # Project dependencies
@@ -83,51 +88,48 @@ live-streaming-system/
 └── README.md                      # Project documentation
 ```
 
-# Testing Guide
+## Testing Guide
 
-Copy `.env.example` and rename it as `.env` and add the API key into this environment variable file. 
+1. Copy `.env.example` and rename it to `.env`. Add the API key to this environment variable file.
+2. Run the server with the following command:
 
-Run server with this command
-
-```
+```bash
 uvicorn app.main:app --reload
 ```
 
-Excute the .m3u8 input link (e.g `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`
-) via docs API `http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post`. 
+3. Execute the `.m3u8` input link (e.g., `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`) via the API documentation at [http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post](http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post).
 
-Open own self-made player (User View) via http://127.0.0.1:8000/static/player.html or VLC Media Play or any Player. 
+4. Open the custom video player at [http://127.0.0.1:8000/static/player.html](http://127.0.0.1:8000/static/player.html) with the streaming video output endpoint `http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8` to view the processed streaming video.
 
-Input our server endpoint ``http://127.0.0.1:8000/api/v1/streaming/playlist.m3u8` to see the processed streaming video:
+5. Subtitle output endpoints:
+   - Vietnamese: [http://127.0.0.1:8000/api/v1/streaming/subtitles/vi.vtt](http://127.0.0.1:8000/api/v1/streaming/subtitles/vi.vtt)
+   - Thai: [http://127.0.0.1:8000/api/v1/streaming/subtitles/th.vtt](http://127.0.0.1:8000/api/v1/streaming/subtitles/th.vtt)
 
-# Benchmarking Results
+## Benchmarking Results
 
-## Benchmarking Results for Speech to Text 
+
+### Benchmarking Results for Speech-to-Text 
+
 We ran 12 audio files with a total duration of 2 minutes.
 
-Groq consistently has the lowest transcription time, averaging 0.46 seconds, with little variation across all audio files.
-
-OpenAI has a moderate performance, with an average time of 1.60 seconds. There is a slight upward trend for some audio files (e.g., audio_3.wav and audio_6.wav).
-
-Whisper Local is significantly slower, averaging 13.47 seconds per file. It shows a clear downward trend initially, stabilizing around 13–14 seconds after audio_2.wav.
+- **Groq**: Consistently has the lowest transcription time, averaging 0.46 seconds, with little variation across all audio files.
+- **OpenAI**: Moderate performance, with an average time of 1.60 seconds. There is a slight upward trend for some audio files (e.g., audio_3.wav and audio_6.wav).
+- **Whisper Local**: Significantly slower, averaging 13.47 seconds per file. It shows a clear downward trend initially, stabilizing around 13–14 seconds after audio_2.wav.
 
 ![Transcription Time Metrics](./benchmarking/results/metrics_transcription_time.png)
 
-## Benchmarking Results for Translation
+#### Benchmarking Results for Translation (Between XL8.ai and OpenAI)
 
-For benchmarking the translation output, we prepared 12 .txt files in the subtitles folder. Each file is the output of text to speech service from 10 seconds length. Thus, total length of audio for evaluation is 2 minutes.
+For benchmarking the translation output, we prepared 12 .txt files in the subtitles folder. Each file is the output of the text-to-speech service from 10 seconds length. Thus, the total length of audio for evaluation is 2 minutes.
 
-For each audio, we use the XL8.ai and GPT-4o from OpenAI for make the translation data for Vietnamese and Thai language.
+For each audio, we use XL8.ai and GPT-4 from OpenAI to make the translation data for Vietnamese and Thai languages.
 
-Then, we use the following metrics for comparing the similarity between translation
+We use the following metrics to compare the similarity between translations:
 
-- TF-IDF (Term Frequency-Inverse Document Frequency) provides quickly the similarity between two texts based on word occurrences. It assigns higher weights to words that appear frequently in a document but rarely in other documents.
-
-- ChrF measures the similarity between two texts at the character level, which makes it more robust to paraphrasing, word reordering, and morphological variations.
-
-- ROUGE-L evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment. Note that because Thai language does not use spaces to separate words. Therefore, the ROUGE-L metric is less useful for Thai language.
-
-- SBERT (Sentence-BERT) measures the semantic similarity between two texts. It evaluates whether two sentences have the same meaning, regardless of word order or word choice. (Using Sentence Transformer model)
+- **TF-IDF**: Provides quick similarity between two texts based on word occurrences. It assigns higher weights to words that appear frequently in a document but rarely in other documents.
+- **ChrF**: Measures the similarity between two texts at the character level, making it more robust to paraphrasing, word reordering, and morphological variations.
+- **ROUGE-L**: Evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment. Note that because the Thai language does not use spaces to separate words, the ROUGE-L metric is less useful for Thai.
+- **SBERT (Sentence-BERT)**: Measures the semantic similarity between two texts. It evaluates whether two sentences have the same meaning, regardless of word order or word choice. (Using Sentence Transformer model)
 
 #### Results for Korean to Vietnamese Translation
 
@@ -136,3 +138,5 @@ Then, we use the following metrics for comparing the similarity between translat
 #### Results for Korean to Thai Translation
 
 ![Metric Visualization Korean to Thai](./benchmarking/results/metrics_visualization_th.png)
+
+### Benchmarking Results for Speech-to-text (Using XL8.ai comparing between cut down and full duration translation)

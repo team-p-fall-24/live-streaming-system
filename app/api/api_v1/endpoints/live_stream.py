@@ -45,3 +45,20 @@ async def get_chunk(filename: str):
         return FileResponse(file_path, headers=headers, media_type="video/MP2T")
     else:
         raise HTTPException(status_code=404, detail="Chunk file not found")
+
+# Endpoint to serve the language.vtt file for subtitles
+# Example: http://127.0.0.1:8000/api/v1/streaming/subtitles/vi.vtt
+@router.get("/subtitles/{language_code}.vtt")
+async def get_language_vtt(language_code: str):
+    file_path = f"app/media/translations/{language_code}.vtt"
+    if os.path.isfile(file_path):
+        headers = {
+            "Content-Type": "text/vtt",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        with open(file_path, "rb") as f:
+            return Response(content=f.read(), headers=headers, media_type="text/vtt")
+    else:
+        raise HTTPException(status_code=404, detail=f"{language_code.capitalize()} subtitle file not found")
