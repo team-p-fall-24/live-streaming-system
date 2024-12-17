@@ -68,7 +68,7 @@ def generate_subtitle_playlist(language: str):
     """Generate .m3u8 playlist for translated subtitles."""
     subtitle_file = f"{PLAYLIST_OUTPUT}/{language}_sub.m3u8"
 
-    subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language}/audio_*.vtt"), key=os.path.getctime)
+    subtitle_files = sorted(glob.glob(f"{TRANSLATION_OUTPUT}/{language}/audio_*.webvtt"), key=os.path.getctime)
     m3u8_content = "#EXTM3U\n"
     m3u8_content += "#EXT-X-PLAYLIST-TYPE:VOD\n"
     m3u8_content += f"#EXT-X-TARGETDURATION:{CHUNK_DURATION}\n"
@@ -140,7 +140,7 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
 
         output_file = os.path.join(
             TRANSLATION_OUTPUT,
-            f"{lang}/{base_name}.vtt"
+            f"{lang}/{base_name}.webvtt"
         )
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         try:

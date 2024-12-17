@@ -31,6 +31,23 @@ async def get_m3u8():
     else:
         raise HTTPException(status_code=404, detail="Playlist not found")
 
+# Endpoint to serve the index .m3u8 master file
+@router.get("/index.m3u8")
+async def get_m3u8():
+    playlist_path = "app/media/index.m3u8"
+    if os.path.isfile(playlist_path):
+        headers = {
+            "Content-Type": "application/vnd.apple.mpegurl",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache",
+            "Expires": "0",
+        }
+        with open(playlist_path, "rb") as f:
+            return Response(content=f.read(), headers=headers, media_type="application/vnd.apple.mpegurl")
+    else:
+        raise HTTPException(status_code=404, detail="Playlist not found")
+
+
 # Endpoint to serve individual .ts video chunks
 @router.get("/chunks/{filename}")
 async def get_chunk(filename: str):
@@ -52,7 +69,7 @@ async def get_subtitle(language: str):
     subtitle_path = f"app/media/playlists/{language}_sub.m3u8"
     if os.path.isfile(subtitle_path):
         headers = {
-            "Content-Type": "text/vtt",  # Correct MIME type for WebVTT
+            "Content-Type": "application/vnd.apple.mpegurl",
             "Cache-Control": "no-cache, no-store, must-revalidate",
             "Pragma": "no-cache",
             "Expires": "0",
