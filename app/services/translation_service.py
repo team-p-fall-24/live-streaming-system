@@ -1,4 +1,5 @@
 import os
+import re
 import requests
 import json
 from dotenv import load_dotenv
@@ -60,16 +61,61 @@ def translate_text(input_text: str, source_language: str = "ko", target_language
     
     return translations
 
-def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
+def split_sentences(text, lang="default"):
     """
-    Translates the content of a text file and saves the translations to .vtt files.
+    Split text into sentences using punctuation-based splitting for default languages.
+    For Thai, split using spaces but ensure a minimum of 10 characters per segment.
+    """
+    if lang == "th":
+        words = text.split()
+        sentences = []
+        current_sentence = []
+        current_length = 0
 
-    Args:
-        input_file (str): Path to the input text file.
-        source_language (str): The source language code (default is "ko").
-        target_languages (list): A list of target language codes.
-        formality (str): Formality level for translation ("HAEYO" or others).
+        for word in words:
+            current_sentence.append(word)
+            current_length += len(word)
+            if current_length >= 10:
+                sentences.append(" ".join(current_sentence))
+                current_sentence = []
+                current_length = 0
+
+        if current_sentence:  # Add any remaining words as the last sentence
+            sentences.append(" ".join(current_sentence))
+        return sentences
+    else:
+        sentence_endings = re.compile(r'(.*?[.!?])\s+')
+        sentences = sentence_endings.findall(text + ' ')
+        if text and text[-1] not in '.!?':
+            sentences.append(text)  # Add the last sentence if no punctuation
+        return [s.strip() for s in sentences if s.strip()]
+
+def calculate_time_intervals(sentences, start_time_offset, chunk_duration):
     """
+    Calculate start and end times proportionally based on sentence length,
+    with an initial time offset.
+    """
+    total_length = sum(len(s) for s in sentences)
+    time_intervals = []
+    current_time = start_time_offset
+    
+    for sentence in sentences:
+        proportion = len(sentence) / total_length
+        duration = proportion * chunk_duration
+        start_time = current_time
+        end_time = current_time + duration
+        time_intervals.append((start_time, end_time, sentence))
+        current_time = end_time
+    return time_intervals
+
+def format_time(seconds):
+    """Format time in H:MM:SS.mmm format."""
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = seconds % 60
+    return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
+
+def translate_file(input_file: str, source_language: str = "ko", target_languages: list = ["vi", "th"], formality: str = "HAEYO") -> None:
     try:
         with open(input_file, "r", encoding="utf-8") as file:
             input_text = file.read().strip()
@@ -85,33 +131,23 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
     )
 
     for lang, translation in translations.items():
-        base_name = os.path.splitext(os.path.basename(input_file))[0]  # e.g., "audio_0"
+        base_name = os.path.splitext(os.path.basename(input_file))[0]
 
-        # Extract the sequence number from the filename
         try:
             index = int(base_name.split('_')[1])
             print(f"Translating chunk {index} to {lang}")
         except (IndexError, ValueError):
-            index = 0  # Default to 0 if parsing fails
+            index = 0
 
-        # Calculate start and end times
-        start_time_seconds = index * CHUNK_DURATION
-        end_time_seconds = (index + 1) * CHUNK_DURATION
+        start_time_offset = index * CHUNK_DURATION
+        chunk_duration = CHUNK_DURATION
+        sentences = split_sentences(translation, lang=lang)
+        time_intervals = calculate_time_intervals(sentences, start_time_offset, chunk_duration)
 
-        # Function to format time in H:MM:SS.mmm
-        def format_time(seconds):
-            hours = int(seconds // 3600)
-            minutes = int((seconds % 3600) // 60)
-            secs = seconds % 60
-            return f"{hours:02d}:{minutes:02d}:{secs:06.3f}"
-
-        start_time = format_time(start_time_seconds)
-        end_time = format_time(end_time_seconds)
-
-        # Generate VTT content with accurate timing
         vtt_content = "WEBVTT\n\n"
-        vtt_content += f"{start_time} --> {end_time}\n"
-        vtt_content += translation + "\n"
+        for start, end, sentence in time_intervals:
+            vtt_content += f"{format_time(start)} --> {format_time(end)}\n"
+            vtt_content += f"{sentence}\n\n"
 
         output_file = os.path.join(
             TRANSLATION_OUTPUT,
