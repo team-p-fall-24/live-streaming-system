@@ -1,6 +1,7 @@
 import glob
 import re
 import os
+import re
 import requests
 import json
 from dotenv import load_dotenv
@@ -67,7 +68,7 @@ def translate_text(
 
     return translations
 
-
+  
 def generate_subtitle_playlist(language: str):
     """Generate .m3u8 playlist for translated subtitles."""
     subtitle_file = f"{PLAYLIST_OUTPUT}/{language}_sub.m3u8"
@@ -156,7 +157,7 @@ def translate_file(
     target_languages: list = ["vi", "th"],
     formality: str = "HAEYO",
 ) -> None:
-    """
+  """
     Translates the content of a text file and saves the translations to .vtt files.
 
     Args:
@@ -191,11 +192,6 @@ def translate_file(
             index = 0  # Default to 0 if parsing fails
 
         # Calculate start and end times
-        start_time_offset = index * CHUNK_DURATION
-        chunk_duration = CHUNK_DURATION
-        sentences = split_sentences(translation, lang=lang)
-        time_intervals = calculate_time_intervals(sentences, start_time_offset, chunk_duration)
-
         start_time_offset = index * CHUNK_DURATION
         chunk_duration = CHUNK_DURATION
         sentences = split_sentences(translation, lang=lang)

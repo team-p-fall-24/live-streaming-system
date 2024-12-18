@@ -21,6 +21,7 @@ def setup_media_directories():
     os.makedirs(SUBTITLE_OUTPUT, exist_ok=True)
     os.makedirs(TRANSLATION_OUTPUT, exist_ok=True)
 
+    
 # Create index files and translation file
 def setup_output_files():
     # index output
@@ -43,11 +44,10 @@ def setup_output_files():
     with open(VIET_WEBVTT_FILE, 'w') as f:
         pass
 
-
 # Function to update the m3u8 playlist file dynamically
 def update_m3u8_playlist():
     try:
-        chunk_files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"))
+        chunk_files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"), key=os.path.getctime)
         if not chunk_files:
             print("No video chunks found to create m3u8 file.")
             return
@@ -62,11 +62,11 @@ def update_m3u8_playlist():
         for chunk_file in chunk_files:
             chunk_filename = os.path.basename(chunk_file)
             m3u8_content += f'#EXTINF:{CHUNK_DURATION}\n/api/v1/live/chunks/{chunk_filename}\n'
-            # m3u8_content += f'#EXT-X-STREAM-INF:SUBTITLES="subs"\n/api/v1/live/chunks/{chunk_filename}\n'
 
         with open(PLAYLIST_FILE, "w") as f:
             f.write(m3u8_content)
         print(f"Updated m3u8 file with {len(chunk_files)} chunks.")
+        
 
     except Exception as e:
         print(f"Error updating m3u8 file: {e}")
@@ -75,7 +75,7 @@ def update_m3u8_playlist():
 def process_video_files():
     processed_files = set()
     while True:
-        files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"))
+        files = sorted(glob.glob(f"{VIDEO_OUTPUT}/video_*.ts"), key=os.path.getctime)
         new_files = [file for file in files if file not in processed_files]
         if new_files:
             for file in new_files:

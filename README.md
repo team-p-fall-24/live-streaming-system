@@ -2,7 +2,7 @@
 
 ## Prerequisite and Installation
 
-Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
+Python 3.12 and FFmpeg version 7.1
 
 ### Required Libraries
 
@@ -107,7 +107,6 @@ uvicorn app.main:app --reload
 
 ## Benchmarking Results
 
-
 ### Benchmarking Results for Speech-to-Text 
 
 We ran 12 audio files with a total duration of 2 minutes.
@@ -152,3 +151,17 @@ In this second experiment, we benchmark the translation quality between the 10 s
 ![Metric Visualization Korean to Thai](./benchmarking/results/thai_metrics_visualization.png)
 
 According to the graph, we can see the high similarity score of SBERT, thus, the meaning of translation between cutting 10 seconds and full length are quite similar. On the other hand, we also see the outperform comparision score by using XL8 comparing to OpenAI for translation task. 
+
+### Benchmarking Results for Delay Time
+
+The simulation evaluates the delay time comparing the latest content of streaming input. The goal is to analyze the time required for content to pass through various processing stages, including video and audio segmentation, transcription, translation, and synchronization. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
+
+Average time for video/ audio segmentation is around 10.1 seconds.
+
+Average time for transcription process (OpenAI Whisper response and cron job processing): 7.8 seconds 
+
+Average time for translation process (XL8.ai translation and cron job for creating subtitles): 8.4 seconds
+
+Average time for synchronization of m3u8 playlist is around 2 seconds.
+
+The total delay time is around ~28.3 seconds. 

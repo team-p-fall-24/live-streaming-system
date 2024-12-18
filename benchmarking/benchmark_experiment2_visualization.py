@@ -22,6 +22,9 @@ def visualize_and_save_metrics(dfs, output_folder):
     languages = ["Vietnamese", "Thai"]
     colors = ['#1f77b4', '#ff7f0e']  # Different colors for each source
 
+    # Prepare dictionaries to store average scores
+    average_scores = {language: {} for language in languages}
+
     for language in languages:
         fig, axes = plt.subplots(2, 2, figsize=(14, 12))  # 2 rows, 2 columns grid
         fig.suptitle(f"Comparing Translation Similarity Metrics Between 10 Seconds Segmentation and Full Length for 2 Minutes of {language}", fontsize=16)
@@ -33,12 +36,13 @@ def visualize_and_save_metrics(dfs, output_folder):
         axes = axes.flatten()  # Flatten axes array for easier iteration
         for i, metric in enumerate(metrics):
             for j, (df, label) in enumerate(language_dfs):
-                axes[i].bar(label, df[metric].values[0], color=colors[j], alpha=0.7, label=label if i == 0 else "")
+                score = df[metric].values[0]
+                axes[i].bar(label, score, color=colors[j], alpha=0.7, label=label)
+                axes[i].text(label, score, f"{score:.4f}", ha='center', va='bottom')  # Add numerical value on the bar
             axes[i].set_title(f"{metric.replace('_', ' ').capitalize()}")
             axes[i].set_xlabel("Translation Source")
             axes[i].set_ylabel("Score")
-            if i == 0:
-                axes[i].legend(loc="upper right")
+            axes[i].legend(loc="upper right")  # Show legend for each subplot
 
         # Adjust layout
         plt.tight_layout()
@@ -56,6 +60,29 @@ def visualize_and_save_metrics(dfs, output_folder):
                 print(f"{metric.replace('_', ' ').capitalize()} ({label}): {df[metric].mean():.4f}")
 
         plt.show()
+
+        # Calculate and store average scores
+        for metric in metrics:
+            for df, label in language_dfs:
+                avg_score = df[metric].mean()
+                if metric not in average_scores[language]:
+                    average_scores[language][metric] = {}
+                average_scores[language][metric][label] = avg_score
+
+    # Save average scores to JSON files
+    for language in languages:
+        avg_scores_file = os.path.join(output_folder, f"{language.lower()}_average_scores.json")
+        with open(avg_scores_file, "w") as f:
+            json.dump(average_scores[language], f, indent=4)
+        print(f"Average scores saved to: {avg_scores_file}")
+
+    # Optionally, print the average scores
+    for language in languages:
+        print(f"\nAverage Scores for {language}:")
+        for metric in metrics:
+            print(f"{metric.replace('_', ' ').capitalize()}:")
+            for label, score in average_scores[language][metric].items():
+                print(f"  {label}: {score:.4f}")
 
 # Main Execution
 if __name__ == "__main__":

@@ -122,11 +122,19 @@
             loadingMessage.textContent = 'Loading video...';
             toggleButtons(false);
 
+            // Remove existing tracks
+            const tracks = video.querySelectorAll('track');
+            tracks.forEach(track => video.removeChild(track));
+
             if (Hls.isSupported()) {
                 const hls = new Hls();
                 hls.loadSource(videoSrc);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    // Add subtitle tracks
+                    addSubtitleTrack('Vietnamese', 'vi', 'http://127.0.0.1:8000/api/v1/streaming/subtitles/vi.vtt', true);
+                    addSubtitleTrack('Thai', 'th', 'http://127.0.0.1:8000/api/v1/streaming/subtitles/th.vtt');
+                    
                     toggleButtons(true);
                     loadingMessage.style.display = 'none';
                 });
@@ -137,6 +145,10 @@
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = videoSrc;
                 video.addEventListener('loadedmetadata', function () {
+                    // Add subtitle tracks
+                    addSubtitleTrack('Vietnamese', 'vi', 'http://127.0.0.1:8000/api/v1/streaming/subtitles/vi.vtt', true);
+                    addSubtitleTrack('Thai', 'th', 'http://127.0.0.1:8000/api/v1/streaming/subtitles/th.vtt');
+
                     toggleButtons(true);
                     loadingMessage.style.display = 'none';
                 });
@@ -146,6 +158,18 @@
             } else {
                 loadingMessage.textContent = 'Your browser does not support HLS streaming.';
             }
+        }
+
+        function addSubtitleTrack(label, lang, src, isDefault = false) {
+            const track = document.createElement('track');
+            track.kind = 'subtitles';
+            track.label = label;
+            track.srclang = lang;
+            track.src = src;
+            if (isDefault) {
+                track.default = true;
+            }
+            video.appendChild(track);
         }
 
         playButton.addEventListener('click', () => video.play());
