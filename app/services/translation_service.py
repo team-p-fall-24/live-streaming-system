@@ -86,7 +86,7 @@ def generate_subtitle_playlist(language: str):
     for file in subtitle_files:
         filename = os.path.basename(file)
         m3u8_content += (
-            f"#EXTINF:{CHUNK_DURATION},\n/api/v1/live/{language}/{filename}\n"
+            f"#EXTINF:{CHUNK_DURATION},\n/api/v1/streaming/{language}/{filename}\n"
         )
 
     with open(subtitle_file, "w") as f:
@@ -157,7 +157,7 @@ def translate_file(
     target_languages: list = ["vi", "th"],
     formality: str = "HAEYO",
 ) -> None:
-  """
+    """
     Translates the content of a text file and saves the translations to .vtt files.
 
     Args:

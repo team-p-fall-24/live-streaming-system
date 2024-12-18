@@ -31,9 +31,9 @@ def setup_output_files():
         m3u8_content += "#EXT-X-VERSION:3\n"
         
         for key in langs:
-            m3u8_content += f'#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME={langs[key]},FORCED=NO,AUTOSELECT=YES,URI="/api/v1/live/subtitles/{key}",LANGUAGE="{key}"\n'
+            m3u8_content += f'#EXT-X-MEDIA:TYPE=SUBTITLES,GROUP-ID="subs",NAME="{langs[key]}",FORCED=NO,AUTOSELECT=YES,URI="/api/v1/streaming/subtitles/{key}",LANGUAGE="{key}"\n'
         
-        m3u8_content += '\n#EXT-X-STREAM-INF:SUBTITLES="subs"\n/api/v1/live/playlist.m3u8'
+        m3u8_content += '\n#EXT-X-STREAM-INF:SUBTITLES="subs"\n/api/v1/streaming/playlist.m3u8'
         f.write(m3u8_content)
     
     print("Finished writing the master output file.")
@@ -61,7 +61,7 @@ def update_m3u8_playlist():
 
         for chunk_file in chunk_files:
             chunk_filename = os.path.basename(chunk_file)
-            m3u8_content += f'#EXTINF:{CHUNK_DURATION}\n/api/v1/live/chunks/{chunk_filename}\n'
+            m3u8_content += f'#EXTINF:{CHUNK_DURATION}\n/api/v1/streaming/chunks/{chunk_filename}\n'
 
         with open(PLAYLIST_FILE, "w") as f:
             f.write(m3u8_content)

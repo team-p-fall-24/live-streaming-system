@@ -32,6 +32,7 @@ async def get_m3u8():
     else:
         raise HTTPException(status_code=404, detail="Playlist not found")
 
+
 # Endpoint to serve the index .m3u8 master file
 @router.get("/index.m3u8")
 async def get_m3u8():
@@ -75,9 +76,11 @@ async def get_subtitle(language: str):
             "Pragma": "no-cache",
             "Expires": "0",
         }
-        return FileResponse(subtitle_path, headers=headers, media_type="text/vtt")
+        with open(subtitle_path, "rb") as f:
+            return Response(content=f.read(), headers=headers, media_type="application/vnd.apple.mpegurl")
     else:
-        raise HTTPException(status_code=404, detail="Subtitle file not found")
+        raise HTTPException(status_code=404, detail=f"{language.capitalize()} subtitle playlist is not found")
+
 
         
 # Endpoint to serve individual translation chunks
