@@ -154,23 +154,14 @@ According to the graph, we can see the high similarity score of SBERT, thus, the
 
 ### Benchmarking Results for Delay Time
 
-This simulation evaluates the delay time for processing content under two scenarios. The goal is to analyze the time required for content to pass through various processing stages, including segmentation, transcription, and translation. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk. Note that in our implementation, we also do the video and audio segmentation in parallel. 
+The simulation evaluates the delay time comparing the latest content of streaming input. The goal is to analyze the time required for content to pass through various processing stages, including video and audio segmentation, transcription, translation, and synchronization. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
 
-Case 1: Synchronized Content Processing
+Average time for video/ audio segmentation is around 10.1 seconds.
 
-In this scenario, the server begins processing content simultaneously as the input streaming server processes the content. The time required to segment and process the first chunk of video is 10 seconds.
+Average time for transcription process (OpenAI Whisper response and cron job processing): 7.8 seconds 
 
-Case 2: Content is ready on Streaming Input
+Average time for translation process (XL8.ai translation and cron job for creating subtitles): 8.4 seconds
 
-In this scenario, the input stream already contains pre-processed content. We only need to segment first chunk directly wihtout waiting content ready for segmentation. Thus, the first chunk of video requires only 0.1 seconds for segmentation since the content is already prepared.
+Average time for synchronization of m3u8 playlist is around 2 seconds.
 
-We have the total time for transcription Time: ~7.8 seconds
-
-We have the total time for translation Time: ~8.4 seconds
-
-Total Time Calculation (Need to update with m3u8 processing time)
-
-| Case       | Segmentation Time | Transcription Time | Translation Time | Total Time |
-|------------|-------------------|--------------------|------------------|------------|
-| **Case 1** | 10.01 seconds        | 7.8 seconds        | 8.4 seconds      | ~26 seconds |
-| **Case 2** | 0.1 seconds       | 7.8 seconds        | 8.4 seconds      | ~16 seconds |
+The total delay time is around ~28.3 seconds. 
