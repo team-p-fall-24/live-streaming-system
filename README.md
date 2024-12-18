@@ -2,7 +2,7 @@
 
 ## Prerequisite and Installation
 
-Built and tested with Python 3.12 and FFmpeg version 7.0.2_1
+Python 3.12 and FFmpeg version 7.1
 
 ### Required Libraries
 
@@ -107,7 +107,6 @@ uvicorn app.main:app --reload
 
 ## Benchmarking Results
 
-
 ### Benchmarking Results for Speech-to-Text 
 
 We ran 12 audio files with a total duration of 2 minutes.
@@ -152,3 +151,27 @@ In this second experiment, we benchmark the translation quality between the 10 s
 ![Metric Visualization Korean to Thai](./benchmarking/results/thai_metrics_visualization.png)
 
 According to the graph, we can see the high similarity score of SBERT, thus, the meaning of translation between cutting 10 seconds and full length are quite similar. On the other hand, we also see the outperform comparision score by using XL8 comparing to OpenAI for translation task. 
+
+### Benchmarking Results for Delay Time
+
+This simulation evaluates the delay time for processing content under two scenarios. The goal is to analyze the time required for content to pass through various processing stages, including segmentation, transcription, and translation. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
+
+Case 1: Synchronized Content Processing
+
+In this scenario, the server begins processing content simultaneously as the input streaming server processes the content. The time required to segment and process the first chunk of video is 10 seconds.
+
+Case 2: Content is ready on Streaming Input
+
+In this scenario, the input stream already contains pre-processed content. We only need to segment first chunk directly wihtout waiting content ready for segmentation. Thus, the first chunk of video requires only 0.1 seconds for segmentation since the content is already prepared.
+
+Processing Stages and Timings
+	•	Transcription Time: ~7.8 seconds
+	•	Translation Time: ~8.4 seconds
+
+Total Time Calculation
+	•	Case 1:
+Total time = Segmentation time (10s) + Transcription time (7.8s) + Translation time (8.4s)
+Total: ~26 seconds
+	•	Case 2:
+Total time = Segmentation time (0.1s) + Transcription time (7.8s) + Translation time (8.4s)
+Total: ~16 seconds
