@@ -10,9 +10,6 @@ env_path = os.path.join(os.path.dirname(__file__), '../../.env')
 load_dotenv(env_path, override=True)
 api_key = os.getenv("XL8_API_KEY")
 
-VIET_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "vietsub.m3u8")
-THAI_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "thaisub.m3u8")
-
 if not api_key:
     raise ValueError("API key not found. Please check your .env file.")
 
@@ -120,8 +117,6 @@ def translate_file(input_file: str, source_language: str = "ko", target_language
         # Calculate start and end times
         start_time_seconds = index * CHUNK_DURATION
         end_time_seconds = (index + 1) * CHUNK_DURATION
-
-        # update_to_global_vtt(language=lang, translation=translation, start_time_seconds=start_time_seconds, end_time_seconds=end_time_seconds)
 
         # Function to format time in H:MM:SS.mmm
         def format_time(seconds):

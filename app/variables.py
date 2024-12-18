@@ -10,6 +10,11 @@ SUBTITLE_OUTPUT = os.getenv("SUBTITLE_OUTPUT")
 TRANSLATION_OUTPUT = os.getenv("TRANSLATION_OUTPUT")
 PLAYLIST_OUTPUT = os.getenv("PLAYLIST_OUTPUT")
 PLAYLIST_FILE = f"{PLAYLIST_OUTPUT}/playlist.m3u8"
-LIVESTREAM_OUTPUT = f"{PLAYLIST_OUTPUT}/index.m3u8"
+MEDIA_DIR = os.getenv("MEDIA_DIR")
+LIVESTREAM_OUTPUT = f"{MEDIA_DIR}/index.m3u8"
+
+VIET_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "vietsub.m3u8")
+THAI_WEBVTT_FILE = os.path.join(TRANSLATION_OUTPUT, "thaisub.m3u8")
+
 # Configurable chunk duration in seconds
 CHUNK_DURATION = int(os.getenv("CHUNK_DURATION"))
