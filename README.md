@@ -154,7 +154,7 @@ According to the graph, we can see the high similarity score of SBERT, thus, the
 
 ### Benchmarking Results for Delay Time
 
-This simulation evaluates the delay time for processing content under two scenarios. The goal is to analyze the time required for content to pass through various processing stages, including segmentation, transcription, and translation. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
+This simulation evaluates the delay time for processing content under two scenarios. The goal is to analyze the time required for content to pass through various processing stages, including segmentation, transcription, and translation. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk. Note that in our implementation, we also do the video and audio segmentation in parallel. 
 
 Case 1: Synchronized Content Processing
 
@@ -168,10 +168,9 @@ Processing Stages and Timings
 	•	Transcription Time: ~7.8 seconds
 	•	Translation Time: ~8.4 seconds
 
-Total Time Calculation
-	•	Case 1:
-Total time = Segmentation time (10s) + Transcription time (7.8s) + Translation time (8.4s)
-Total: ~26 seconds
-	•	Case 2:
-Total time = Segmentation time (0.1s) + Transcription time (7.8s) + Translation time (8.4s)
-Total: ~16 seconds
+Total Time Calculation (Need to update with m3u8 processing time)
+
+| Case       | Segmentation Time | Transcription Time | Translation Time | Total Time |
+|------------|-------------------|--------------------|------------------|------------|
+| **Case 1** | 10.01 seconds        | 7.8 seconds        | 8.4 seconds      | ~26 seconds |
+| **Case 2** | 0.1 seconds       | 7.8 seconds        | 8.4 seconds      | ~16 seconds |
