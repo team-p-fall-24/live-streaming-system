@@ -165,6 +165,7 @@ Case 2: Content is ready on Streaming Input
 In this scenario, the input stream already contains pre-processed content. We only need to segment first chunk directly wihtout waiting content ready for segmentation. Thus, the first chunk of video requires only 0.1 seconds for segmentation since the content is already prepared.
 
 We have the total time for transcription Time: ~7.8 seconds
+
 We have the total time for translation Time: ~8.4 seconds
 
 Total Time Calculation (Need to update with m3u8 processing time)
