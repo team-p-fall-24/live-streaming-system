@@ -158,6 +158,8 @@ Average time for transcription process (OpenAI Whisper response and cron job pro
 
 Average time for translation process (XL8.ai translation and cron job for creating subtitles): 8.4 seconds
 
-Average time for synchronization of m3u8 playlist is around 2 seconds.
+Average time for synchronization of m3u8 playlist is around 0.01 seconds.
 
-The total delay time is around ~28.3 seconds. 
+The total delay time is around ~26.3 seconds. 
+
+We also perform the simulation with HLS.js library. At a delay rate of around 27 seconds, the video with subtitles runs smoothly.
