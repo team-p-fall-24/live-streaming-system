@@ -24,7 +24,7 @@ def visualize_and_save_metrics(df, output_folder):
     metrics = ["tfidf_similarity", "chrf_score", "rouge_l", "sbert_similarity"]
     num_metrics = len(metrics)
     fig, axes = plt.subplots(2, 2, figsize=(14, 12))  # 2 rows, 2 columns grid
-    fig.suptitle("Comparing Translation Similarity Metrics Between XL8 and OpenAI for Korean to Vietnamese Translations", fontsize=16)
+    fig.suptitle("Comparing Translation Similarity Metrics Between XL8 and OpenAI for Korean to Thai Translations", fontsize=16)
 
     # Plot each metric
     averages = {}
@@ -46,7 +46,7 @@ def visualize_and_save_metrics(df, output_folder):
     plt.subplots_adjust(top=0.9)  # Make room for the main title
 
     # Save the output image
-    output_path = os.path.join(output_folder, "metrics_visualization_vi.png")
+    output_path = os.path.join(output_folder, "metrics_visualization_th.png")
     plt.savefig(output_path, dpi=300)
     print(f"Visualization saved to: {output_path}")
 
@@ -59,7 +59,7 @@ def visualize_and_save_metrics(df, output_folder):
 
 # Main Execution
 if __name__ == "__main__":
-    metrics_file = "metrics_results_vi.json"  # Path to the JSON file
+    metrics_file = "metrics_results_th.json"  # Path to the JSON file
     results_folder = "./results"  # Folder to save the visualization
 
     # Load metrics into a DataFrame
