@@ -1,0 +1,18 @@
+{
+    "tfidf_similarity": {
+        "XL8 Thai": 0.7191043412585604,
+        "OpenAI Thai": 0.36682218543549544
+    },
+    "chrf_score": {
+        "XL8 Thai": 72.48674400151766,
+        "OpenAI Thai": 47.79748713776525
+    },
+    "rouge_l": {
+        "XL8 Thai": 0.5,
+        "OpenAI Thai": 0.5714285714285715
+    },
+    "sbert_similarity": {
+        "XL8 Thai": 0.865495502948761,
+        "OpenAI Thai": 0.8749812841415405
+    }
+}

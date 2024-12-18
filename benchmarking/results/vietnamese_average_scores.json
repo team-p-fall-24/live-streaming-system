@@ -1,0 +1,18 @@
+{
+    "tfidf_similarity": {
+        "XL8 Vietnamese": 0.9166434956692696,
+        "OpenAI Vietnamese": 0.6989141341291467
+    },
+    "chrf_score": {
+        "XL8 Vietnamese": 69.6081227202738,
+        "OpenAI Vietnamese": 47.68151043394812
+    },
+    "rouge_l": {
+        "XL8 Vietnamese": 0.6136177194421657,
+        "OpenAI Vietnamese": 0.4455066921606119
+    },
+    "sbert_similarity": {
+        "XL8 Vietnamese": 0.8777320384979248,
+        "OpenAI Vietnamese": 0.8947547674179077
+    }
+}
