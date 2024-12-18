@@ -73,7 +73,7 @@ def generate_subtitle_playlist(language: str):
     subtitle_file = f"{PLAYLIST_OUTPUT}/{language}_sub.m3u8"
 
     subtitle_files = sorted(
-        glob.glob(f"{TRANSLATION_OUTPUT}/{language}/audio_*.webvtt"),
+        glob.glob(f"{TRANSLATION_OUTPUT}/{language}/audio_*.vtt"),
         key=os.path.getctime,
     )
     m3u8_content = "#EXTM3U\n"
