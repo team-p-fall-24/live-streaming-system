@@ -139,7 +139,7 @@ live-streaming-system/
 
 ## Benchmarking Results
 
-### Benchmarking Results for Speech-to-Text 
+### Experiment 1: Benchmarking the response time of Speech to Text API services
 
 We ran 12 audio files with a total duration of 2 minutes.
 
@@ -149,7 +149,9 @@ We ran 12 audio files with a total duration of 2 minutes.
 
 ![Transcription Time Metrics](./benchmarking/results/metrics_transcription_time.png)
 
-#### Benchmarking Results for Translation (Between XL8.ai and OpenAI)
+### Experiment 2: Benchmarking the translation quality of our service
+
+### Experiment 2.1: Benchmarking the similirity of translation between XL8.ai and OpenAI services
 
 For benchmarking the translation output, we prepared 12 .txt files in the subtitles folder. Each file is the output of the text-to-speech service from 10 seconds length. Thus, the total length of audio for evaluation is 2 minutes.
 
@@ -174,7 +176,7 @@ For this result, we first have figure showing the translation similarity metrics
 
 For Thai language, because there is less space for separating between independent word, thus Rouge L is less useful metrics. We can also see the high average results of SBERT similarity score. Therefore, we can see the similarity between the translation output of using Xl8 and OpenAI services for Vietnamese and Thai language.
 
-### Benchmarking Results for Speech-to-text (Using XL8.ai comparing between 10-second-segmentation and full duration translation)
+### Experiment 2.2: Benchmarking the similarity between our 10-second-segmentation and full-duration without segmentation
 
 In this second experiment, we benchmark the translation quality between the 10 segmentation and full size duration. For full size duration, we translate 2-minute-audio using both service. On the other hand, we merged the translation results of 12 translation files with each duration of 10-second-segmentation. Then comparing using the above metrics. 
 
@@ -188,7 +190,7 @@ In this second experiment, we benchmark the translation quality between the 10 s
 
 According to the graph, we can see the high similarity score of SBERT, thus, the meaning of translation between cutting 10 seconds and full length are quite similar. On the other hand, we also see the outperform comparision score by using XL8 comparing to OpenAI for translation task. 
 
-### Benchmarking Results for Delay Time
+### Experiment 3: Benchmarking the total delay time of out streaming service
 
 The simulation evaluates the delay time comparing the latest content of streaming input. The goal is to analyze the time required for content to pass through various processing stages, including video and audio segmentation, transcription, translation, and synchronization. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
 
