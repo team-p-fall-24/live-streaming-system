@@ -58,11 +58,12 @@ uvicorn app.main:app --reload
 Once running, access the Swagger UI for API documentation at:
 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-### Processing Input Streaming `.m3u8` URLs
+### Processing Input Streaming `.m3u8` URL
 
 To process an `.m3u8` input link (e.g., `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`):
 
 1. Open the API documentation in Swagger UI: [http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post](http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post).
+
 2. Use the **`POST`** endpoint to submit the `.m3u8` URL for processing.
 
 ### Demo
@@ -158,20 +159,24 @@ We use the following metrics to compare the similarity between translations:
 
 - **TF-IDF**: Provides quick similarity between two texts based on word occurrences. It assigns higher weights to words that appear frequently in a document but rarely in other documents.
 - **ChrF**: Measures the similarity between two texts at the character level, making it more robust to paraphrasing, word reordering, and morphological variations.
-- **ROUGE-L**: Evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment. Note that because the Thai language does not use spaces to separate words, the ROUGE-L metric is less useful for Thai.
+- **ROUGE-L**: Evaluates the Longest Common Subsequence (LCS) between two texts. It measures structural similarity, including word overlap and sentence structure alignment.
 - **SBERT (Sentence-BERT)**: Measures the semantic similarity between two texts. It evaluates whether two sentences have the same meaning, regardless of word order or word choice. (Using Sentence Transformer model)
 
 #### Results for Korean to Vietnamese Translation
 
 ![Metric Visualization Korean to Vietnamese](./benchmarking/results/metrics_visualization_vi.png)
 
+For this result, we first have figure showing the translation similarity metrics between XL8 and OpenAI for translating segmented audio files from Korean to Vietnamese. Similarity scores for TF-IDF, ChrF, and ROUGE-L ranged from 45–60%, indicating variations in word choice and sentence structure. However, the SBERT score averaged 80%, showing strong alignment in the meaning of the translations.
+
 #### Results for Korean to Thai Translation
 
 ![Metric Visualization Korean to Thai](./benchmarking/results/metrics_visualization_th.png)
 
+For Thai language, because there is less space for separating between independent word, thus Rouge L is less useful metrics. We can also see the high average results of SBERT similarity score. Therefore, we can see the similarity between the translation output of using Xl8 and OpenAI services for Vietnamese and Thai language.
+
 ### Benchmarking Results for Speech-to-text (Using XL8.ai comparing between 10-second-segmentation and full duration translation)
 
-In this second experiment, we benchmark the translation quality between the 10 segmentation and full size duration. For full size duration, we translate 2-minute-audio using both service. On the other hand, we merged the translation results of 12 10-second-segmentation. Then comparing using the above method
+In this second experiment, we benchmark the translation quality between the 10 segmentation and full size duration. For full size duration, we translate 2-minute-audio using both service. On the other hand, we merged the translation results of 12 translation files with each duration of 10-second-segmentation. Then comparing using the above metrics. 
 
 #### Results for Korean to Vietnamese Translation
 
@@ -187,14 +192,14 @@ According to the graph, we can see the high similarity score of SBERT, thus, the
 
 The simulation evaluates the delay time comparing the latest content of streaming input. The goal is to analyze the time required for content to pass through various processing stages, including video and audio segmentation, transcription, translation, and synchronization. As we parallel processing the with multiple workers, so the delay time is only the total time for processing one chunk.
 
-Average time for video/ audio segmentation is around 10.1 seconds.
+- Average time for video/ audio segmentation is around 10.1 seconds.
 
-Average time for transcription process (OpenAI Whisper response and cron job processing): 7.8 seconds 
+- Average time for transcription process (OpenAI Whisper response and cron job processing): 7.8 seconds 
 
-Average time for translation process (XL8.ai translation and cron job for creating subtitles): 8.4 seconds
+- Average time for translation process (XL8.ai translation and cron job for creating subtitles): 8.4 seconds
 
-Average time for synchronization of m3u8 playlist is around 0.01 seconds.
+- Average time for synchronization of m3u8 playlist is around 0.01 seconds.
 
-The total delay time is around ~26.3 seconds. 
+Thus, the total delay time is around ~26.3 seconds. 
 
-We also perform the simulation with HLS.js library. At a delay rate of around 27 seconds, the video with subtitles runs smoothly.
+In addition, we also perform the simulation with HLS.js library. At a delay rate of around 27 seconds, the video with subtitles runs smoothly.
