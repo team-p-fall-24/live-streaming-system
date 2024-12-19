@@ -1,39 +1,87 @@
 # Real-time Live Streaming Multilingual Subtitles System
 
-## Prerequisite and Installation
+## User Manual
 
-Python 3.12 and FFmpeg version 7.1
+### Prerequisites and Installation
 
-### Required Libraries
+Ensure you have the following installed:
 
-#### FFmpeg Library
+- **Python 3.12**
+- **FFmpeg** (version 7.1 or later)
 
-- For Mac, please use `brew install ffmpeg`
-- To deploy on a Linux server, follow this guideline: [FFmpeg Compilation Guide for Ubuntu](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg) to install the latest version instead of using `apt install`.
+#### Installing FFmpeg
+
+- **Mac**: Use the following command to install FFmpeg:
+  ```bash
+  brew install ffmpeg
+  ```
+- **Linux**: Using the [FFmpeg Compilation Guide for Ubuntu](https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu#FFmpeg) to install the latest version and build from source to having full support features.
 
 ### Project Configuration
 
-```bash
-# Create virtual environment
-python3 -m venv venv
+1. **Create a Virtual Environment**
+   ```bash
+   python3 -m venv venv
+   ```
 
-# Activate environment
-source venv/bin/activate
+2. **Activate the Environment**
+   ```bash
+   source venv/bin/activate
+   ```
 
-# Install requirements
-pip3 install -r requirements.txt
+3. **Install Dependencies**
+   ```bash
+   pip3 install -r requirements.txt
+   ```
 
-# If there are additional libraries installed during development, please update requirements.txt
-pip3 freeze > requirements.txt
-```
+4. **Update Requirements File** (if new libraries are added during development):
+   ```bash
+   pip3 freeze > requirements.txt
+   ```
+
+### Setting Up Environment Variables
+
+1. Copy the `.env.example` file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Add the necessary API keys and other environment-specific variables to the `.env` file.
 
 ### Running the Server
+
+Start the server with the following command:
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Swagger UI for API documentation can be accessed at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+Once running, access the Swagger UI for API documentation at:
+[http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
+### Processing Input Streaming `.m3u8` URLs
+
+To process an `.m3u8` input link (e.g., `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`):
+
+1. Open the API documentation in Swagger UI: [http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post](http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post).
+2. Use the **`POST`** endpoint to submit the `.m3u8` URL for processing.
+
+### Demo
+
+#### Viewing the Processed Streaming Video
+
+To view the processed `.m3u8` output stream with subtitles, use HLS.js:
+
+1. **Install HLS.js**
+   ```bash
+   git clone https://github.com/video-dev/hls.js.git
+   cd hls.js
+   npm install
+   npm run dev
+   ```
+
+2. Open the HLS.js Demo interface.
+3. Enter the output endpoint from your server (e.g., `http://127.0.0.1:8000/api/v1/streaming/index.m3u8`) into the HLS.js player to view the processed streaming video.
+
 
 ## Project Structure Overview
 
@@ -87,19 +135,6 @@ live-streaming-system/
 ├── .github                        # GitHub configuration for CI/CD and GitHub PR/Issues Template
 └── README.md                      # Project documentation
 ```
-
-## Testing Guide
-
-1. Copy `.env.example` and rename it to `.env`. Add the API key to this environment variable file.
-2. Run the server with the following command:
-
-```bash
-uvicorn app.main:app --reload
-```
-
-3. Execute the `.m3u8` input link (e.g., `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`) via the API documentation at [http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post](http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post).
-
-4. Open the custom video player via HLS.js Demo (https://github.com/video-dev/hls.js) with the streaming video output endpoint `http://127.0.0.1:8000/api/v1/streaming/index.m3u8` to view the processed streaming video.
 
 ## Benchmarking Results
 
