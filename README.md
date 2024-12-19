@@ -99,7 +99,7 @@ uvicorn app.main:app --reload
 
 3. Execute the `.m3u8` input link (e.g., `http://cache1.castiscdn.com:28080/snu/live.stream/tsmux_master.m3u8`) via the API documentation at [http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post](http://127.0.0.1:8000/docs#/live_stream/process_video_endpoint_api_v1_live_process_stream__post).
 
-4. Open the custom video player at [http://127.0.0.1:8000/static/player.html](http://127.0.0.1:8000/static/player.html) with the streaming video output endpoint `http://127.0.0.1:8000/api/v1/streaming/index.m3u8` to view the processed streaming video.
+4. Open the custom video player via HLS.js Demo (https://github.com/video-dev/hls.js) with the streaming video output endpoint `http://127.0.0.1:8000/api/v1/streaming/index.m3u8` to view the processed streaming video.
 
 ## Benchmarking Results
 
