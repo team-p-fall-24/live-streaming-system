@@ -110,7 +110,7 @@ def process_audio_files():
 
 # Monitors and processes subtitle files, call the translation service, and update the translation .m3u8 file
 def process_translation_files():
-    def is_file_stable(file_path, wait_time=6):
+    def is_file_stable(file_path, wait_time=4):
         initial_size = os.path.getsize(file_path)
         time.sleep(wait_time)
         final_size = os.path.getsize(file_path)
