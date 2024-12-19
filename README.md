@@ -181,17 +181,19 @@ For Thai language, because there is less space for separating between independen
 
 ### Experiment 2.2: Benchmarking the similarity between our 10-second-segmentation and full-duration without segmentation
 
-In this second experiment, we benchmark the translation quality between the 10 segmentation and full size duration. For full size duration, we translate 2-minute-audio using both service. On the other hand, we merged the translation results of 12 translation files with each duration of 10-second-segmentation. Then comparing using the above metrics. 
-
-#### Results for Korean to Vietnamese Translation
-
-![Metric Visualization Korean to Vietnamese](./benchmarking/results/vietnamese_metrics_visualization.png)
+This experiment evaluates the translation quality of the 10-second segmentation method compared to full-length translations for Thai audio. The results demonstrate that XL8.ai outper-forms OpenAI in key metrics such as TFIDF similarity (0.7191 vs. 0.3668) and ChrF score (72.4867 vs. 47.7975), indicating better contextual and character-level accuracy. While OpenAI achieves a slightly higher Rouge-L score (0.5714 vs. 0.5000), both services show similar SBERT similarity scores around 87%, reflecting a high degree of semantic preservation. Overall, XL8.ai’s translations for Thai audio provide higher quality in a segmented approach, making it a better option for maintaining translation consistency and accuracy when using the 10-second segmen-tation method.
 
 #### Results for Korean to Thai Translation
 
 ![Metric Visualization Korean to Thai](./benchmarking/results/thai_metrics_visualization.png)
 
-According to the graph, we can see the high similarity score of SBERT, thus, the meaning of translation between cutting 10 seconds and full length are quite similar. On the other hand, we also see the outperform comparision score by using XL8 comparing to OpenAI for translation task. 
+This figure compares translation similarity metrics between XL8.ai and OpenAI for Vietnamese audio using a 10-second segmentation method versus full-length translations. The results show that XL8.ai outperforms OpenAI in TFIDF similarity (0.9166 vs. 0.6989), ChrF score (69.6081 vs. 47.6815), and Rouge-L score (0.6136 vs. 0.4455), indicating superior contextual relevance, character-level accuracy, and sequence preservation in translations. Both services demonstrate high semantic similarity, with OpenAI scoring slightly higher on SBERT similarity (0.8948 vs. 0.8777). Overall, XL8.ai proves to be more effective in maintaining translation quality with the 10-second segmentation method, making it a stronger option for Vietnamese audio processing.
+
+#### Results for Korean to Vietnamese Translation
+
+![Metric Visualization Korean to Vietnamese](./benchmarking/results/vietnamese_metrics_visualization.png)
+
+From the comparison of both graphs for Thai and Vietnamese translations, it is evident that XL8.ai consistently outperforms OpenAI in key metrics such as TFIDF similarity, ChrF score, and Rouge-L score. These results demonstrate that XL8.ai provides superior contextual relevance, character-level accuracy, and sequence preservation when using the 10-second segmentation method. Additionally, the high SBERT similarity scores for both XL8.ai and OpenAI (around 87-89%) across both languages indicate that the segmentation method has minimal impact on the semantic meaning of the translations. This highlights that XL8.ai is the preferred translation service for maintaining high-quality translations with segmented audio while ensuring that the segmentation approach does not significantly affect the overall translation quality. 
 
 ### Experiment 3: Benchmarking the total delay time of out streaming service
 
