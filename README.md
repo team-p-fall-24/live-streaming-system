@@ -86,6 +86,8 @@ To view the processed `.m3u8` output stream with subtitles, use HLS.js:
 
 ## Project Structure Overview
 
+## Project Structure Overview
+
 ```plaintext
 live-streaming-system/
 ├── app/
@@ -102,7 +104,7 @@ live-streaming-system/
 │   │   │   ├── endpoints/
 │   │   │   │   ├── __init__.py
 │   │   │   │   ├── live_stream.py # Endpoints related to live streaming
-│   ├── media/
+│   ├── media/                     # This folder will be automatically generated when processing the input streaming URL
 │   │   ├── audio                  # Store the audio segmentation
 |   |   ├── chunks                 # Store the video segmentation
 |   |   ├── playlists              # Store the playlist.m3u8 ~ Output file of our service
@@ -128,8 +130,9 @@ live-streaming-system/
 │       ├── __init__.py
 │       ├── base.py                # Base model class for ORM
 │       └── session.py             # Database session management
-├── benchmarking/
+├── benchmarking/                  # Folder containing the data and implementation for benchmarking
 │   ├── results/                   # Folder containing benchmarking results
+├── docs                           # Folder containing docs and public media
 ├── .env                           # Environment variables
 ├── .gitignore                     # Git ignore file
 ├── requirements.txt               # Project dependencies
