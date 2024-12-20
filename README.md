@@ -83,9 +83,6 @@ To view the processed `.m3u8` output stream with subtitles, use HLS.js:
 2. Open the HLS.js Demo interface.
 3. Enter the output endpoint from your server (e.g., `http://127.0.0.1:8000/api/v1/streaming/index.m3u8`) into the HLS.js player to view the processed streaming video.
 
-
-## Project Structure Overview
-
 ## Project Structure Overview
 
 ```plaintext
